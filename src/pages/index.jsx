@@ -24,8 +24,8 @@ const Index = ({ data }) => {
   const { edges } = data.allMarkdownRemark;
   return (
     <Layout>
-      <Helmet title={'Home Page'} />
-      <Header title="Home Page">Gatbsy Tutorial Starter</Header>
+      <Helmet title={'Jacob Madden'} />
+      <Header title="Jacob Madden"></Header>
       <PostWrapper>
         {edges.map(({ node }) => (
           <PostList
@@ -68,7 +68,7 @@ Index.propTypes = {
 export const query = graphql`
   query {
     allMarkdownRemark(
-      limit: 6
+      limit: 12
       sort: { order: DESC, fields: [frontmatter___date] }
     ) {
       edges {

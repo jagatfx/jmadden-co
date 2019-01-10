@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'react-emotion';
 import Img from 'gatsby-image';
 import PropTypes from 'prop-types';
+import githubLogo from './github.png';
+import linkedinLogo from './linkedin.png';
 
 const Wrapper = styled.header`
   -webkit-clip-path: polygon(100% 0, 0 0, 0 70%, 50% 100%, 100% 70%);
@@ -44,12 +46,25 @@ const Subtitle = styled.p`
   color: ${props => props.theme.colors.white.light};
 `;
 
+const Link = styled.a`
+  padding: 5px;
+`;
+
+const Quote = styled.blockquote`
+  font-style: italic;
+`;
+
 const Header = ({ children, title, date, cover }) => (
   <Wrapper>
-    <Img fluid={cover || {} || [] || ''} />
+    <Img fluid={{} || [] || ''} />
     <Text>
       <h1>{title}</h1>
+      <Quote>Don't cry because it's over, smile because it happened. -Dr Seuss</Quote>
       <h3>{date}</h3>
+      <span>
+        <Link href="https://github.com/jagatfx" target="_blank"><img src={githubLogo} alt="Github" /></Link>
+        <Link href="https://www.linkedin.com/in/jacobmadden/" target="_blank"><img src={linkedinLogo} alt="LinkedIn" /></Link>
+      </span>
 
       {children && <Subtitle>{children}</Subtitle>}
     </Text>

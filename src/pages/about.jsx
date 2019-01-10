@@ -4,6 +4,7 @@ import styled from 'react-emotion';
 import PropTypes from 'prop-types';
 import { Header } from 'components';
 import { Layout, Container } from 'layouts';
+import logo from '../../static/logo/logo.png';
 
 const Text = styled.div`
     margin: 2rem 10rem;
@@ -12,20 +13,17 @@ const Text = styled.div`
 
 const About = center => (
   <Layout>
-    <Helmet title={'About Page'} />
-    <Header title="About Page">Gatsby Tutorial Starter</Header>
+    <Helmet title={'Jacob Madden | About'} />
+    <Header title="About"></Header>
     <Container center={center}>
+      <Text><h3>Jacob Madden</h3><br />
+        Experienced Lead Developer with a demonstrated history of working in the computer software industry.
+        Strong consulting professional skilled in full-stack software development, artificial intelligence,
+        robotics, VR/AR and data analytics.
+      </Text>
+      <img src={logo} alt="logo" />
       <Text>
-        <h3>
-          If you would like to build this site completely from scratch, you go
-          can go read the guide{' '}
-          <a href="https://justinformentin.com/gatsby-v2-guide">here.</a>
-        </h3>
-        <br />
-        <h3>
-          Or you can watch the video{' '}
-          <a href="https://youtube.com/#">on Youtube.</a>
-        </h3>
+        Georgia Tech grad, full stack software developer, artificial intelligence & machine learning researcher, VR/AR/MR, robotics, Unity, iOS
       </Text>
     </Container>
   </Layout>
