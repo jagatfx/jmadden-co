@@ -54,21 +54,30 @@ const Quote = styled.blockquote`
   font-style: italic;
 `;
 
-const Header = ({ children, title, date, cover }) => (
-  <Wrapper>
-    <Img fluid={{} || [] || ''} />
-    <Text>
-      <h1>{title}</h1>
-      <Quote>Don't cry because it's over, smile because it happened. -Dr Seuss</Quote>
-      <h3>{date}</h3>
-      <span>
-        <Link href="https://github.com/jagatfx" target="_blank"><img src={githubLogo} alt="Github" /></Link>
-        <Link href="https://www.linkedin.com/in/jacobmadden/" target="_blank"><img src={linkedinLogo} alt="LinkedIn" /></Link>
-      </span>
+const SubHeader = styled.div`
+  padding-top: 20px;
+  text-align: center;
+`;
 
-      {children && <Subtitle>{children}</Subtitle>}
-    </Text>
-  </Wrapper>
+const Header = ({ children, title, date, cover }) => (
+  <div>
+    <Wrapper>
+      <Img fluid={{} || [] || ''} />
+      <Text>
+        <h1>{title}</h1>
+        <h3>{date}</h3>
+
+        {children && <Subtitle>{children}</Subtitle>}
+      </Text>
+    </Wrapper>
+    <SubHeader>
+    <Quote>Don't cry because it's over, smile because it happened. -Dr Seuss</Quote>
+    <span>
+      <Link href="https://github.com/jagatfx" target="_blank"><img src={githubLogo} alt="Github" /></Link>
+      <Link href="https://www.linkedin.com/in/jacobmadden/" target="_blank"><img src={linkedinLogo} alt="LinkedIn" /></Link>
+    </span>
+    </SubHeader>
+  </div>
 );
 
 export default Header;
