@@ -21,7 +21,11 @@
         "extensions": [".js", ".jsx"]
       }
     ],
-    "prettier/prettier": "warn"
+    "prettier/prettier": "warn",
+    "emotion/jsx-import": "error",
+    "emotion/no-vanilla": "error",
+    "emotion/import-from-emotion": "error",
+    "emotion/styled-import": "error"
   },
   "extends": [
     "eslint:recommended",

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'gatsby';
-import styled from 'react-emotion';
+import styled from '@emotion/styled';
 import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 import { Layout, Container } from 'layouts';
@@ -53,6 +53,6 @@ export default Tag;
 Tag.propTypes = {
   pageContext: PropTypes.shape({
     posts: PropTypes.array,
-    tagname: PropTypes.string,
+    tagName: PropTypes.string,
   }),
 };

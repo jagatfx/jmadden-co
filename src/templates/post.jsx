@@ -1,13 +1,9 @@
 import React from 'react';
 import { graphql, Link } from 'gatsby';
-import styled from 'react-emotion';
+import styled from '@emotion/styled';
 import PropTypes from 'prop-types';
 import { Layout, Container, Content } from 'layouts';
 import { TagsBlock, Header, SEO } from 'components';
-// import Header from '../components/Header';
-// import Container from '../layouts/Container';
-// import Content from '../layouts/Content';
-// import SEO from '../components/SEO';
 import '../styles/prism';
 
 const SuggestionBar = styled.div`
@@ -25,24 +21,23 @@ const PostSuggestion = styled.div`
 
 const Post = ({ data, pageContext }) => {
   const { next, prev } = pageContext;
-  const post = data.markdownRemark;
-  const image = post.frontmatter.cover.childImageSharp.fluid;
-  const title = post.frontmatter.title;
-  const date = post.frontmatter.date;
-  const html = post.html;
+  const {html, frontmatter, excerpt } = data.markdownRemark
+  const {date, title, tags, path, description} = frontmatter
+  const image = frontmatter.cover.childImageSharp.fluid;
+
   return (
     <Layout>
       <SEO
         title={title}
-        description={post.frontmatter.description || post.excerpt || ' '}
-        image={image}
-        pathname={post.frontmatter.path}
+        description={description || excerpt || ' '}
+        banner={image}
+        pathname={path}
         article
       />
       <Header title={title} date={date} cover={image} />
       <Container>
         <Content input={html} />
-        <TagsBlock list={post.frontmatter.tags || []} />
+        <TagsBlock list={tags || []} />
       </Container>
       <SuggestionBar>
         <PostSuggestion>

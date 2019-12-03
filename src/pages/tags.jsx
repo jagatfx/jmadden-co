@@ -5,7 +5,7 @@ import { Header, TagsBlock } from 'components';
 
 const Tags = ({ pageContext }) => {
   const { tags } = pageContext;
-console.log(pageContext)
+
   return (
     <Layout>
       <Header title="Jacob Madden | Topic Tags"></Header>
