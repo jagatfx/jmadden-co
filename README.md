@@ -4,7 +4,7 @@
       src="https://i.imgur.com/mW3HLrn.png"
       height="80"
       alt="gatsby-v2-tutorial-starter"
-      title="Gatsby v2 Tutorial Starter"
+      title="Personal homepage using Gatsby v2 Tutorial Starter"
     />
   </a>
 </p>
