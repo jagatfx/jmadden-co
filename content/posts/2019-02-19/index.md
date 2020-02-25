@@ -14,4 +14,4 @@ Autism Sidekick is a project focused on granting super powers to people living w
 
 `youtube:https://www.youtube.com/embed/bH6RDs4iTjQ`
 
-You can learn more at the website at <a href="https://www.autismsidekick.com/" target="_blank">Autism Sidekick website</a> and by reading the pitch deck at <a href="https://s3.amazonaws.com/autism-sidekick/2019UnityforHumanity_AutismSidekick.pdf" target="_blank">Autism Sidekick pitch deck</a>.
+You can learn more by reading the pitch deck at <a href="https://s3.amazonaws.com/autism-sidekick/2019UnityforHumanity_AutismSidekick.pdf" target="_blank">Autism Sidekick pitch deck</a>.
