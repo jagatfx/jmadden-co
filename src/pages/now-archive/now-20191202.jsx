@@ -23,18 +23,19 @@ const Now = center => (
 
       <h2>Date Updated</h2>
 
-      <p>02/24/2020</p>
+      <p>12/02/2019</p>
 
       <h2>Location</h2>
 
-      <p>New York, NY, USA</p>
+      <p>Schenectady, New York, USA</p>
 
       <h2>What I&#39;m Doing Right Now</h2>
 
-      <p>Onboarding at a new gig and learning all the things</p>
-      <p>Experimenting with features for practicar spanish language practice React app</p>
-      <p>Exploring character cartridges and personas in virtual reality</p>
-      <p>Finalizing trail challenge React-based mobile app</p>
+      <p>Working on a Costa Rica jungle VR experience where you experience life as different animals</p>
+      <p>Editing footage from our Azure Kinect real-time volumetric capture augmented reality dancer performances</p>
+      <p>Exploring virtual hand interactions on Oculus Quest</p>
+      <p>Investigating health and wellness wearables and metrics</p>
+      <p>Making a trail challenge app</p>
     </Container>
   </Layout>
 );
