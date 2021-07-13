@@ -11,14 +11,14 @@ const TagsContainer = styled.div`
   justify-content: center;
   a {
     margin: 0 1rem 1rem 0;
-    color: ${props => props.theme.colors.black.blue};
+    color: ${(props) => props.theme.colors.black.blue};
     padding: 0.3rem 0.6rem;
-    background: ${props => props.theme.colors.white.grey};
+    background: ${(props) => props.theme.colors.white.grey};
     border-radius: 10px;
     &:hover {
-      color: ${props => props.theme.colors.white.light};
-      background: ${props => props.theme.colors.primary.light};
-      border: ${props => props.theme.colors.primary.light};
+      color: ${(props) => props.theme.colors.white.light};
+      background: ${(props) => props.theme.colors.primary.light};
+      border: ${(props) => props.theme.colors.primary.light};
     }
   }
 `;
@@ -26,7 +26,7 @@ const TagsContainer = styled.div`
 const TagsBlock = ({ list }) => (
   <TagsContainer>
     {list &&
-      list.map(tag => {
+      list.map((tag) => {
         const upperTag = tag.charAt(0).toUpperCase() + tag.slice(1);
         return (
           <Link key={tag} to={`/tags/${tag}`}>

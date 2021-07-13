@@ -14,7 +14,7 @@ const ImageWrap = styled.img`
   padding-top: 10px;
 `;
 
-const Now = center => (
+const Now = (center) => (
   <Layout>
     <Helmet title={'Jacob Madden | Now'} />
     <Header title="Now"></Header>
@@ -32,7 +32,10 @@ const Now = center => (
       <h2>What I&#39;m Doing Right Now</h2>
 
       <p>Onboarding at a new gig and learning all the things</p>
-      <p>Experimenting with features for practicar spanish language practice React app</p>
+      <p>
+        Experimenting with features for practicar spanish language practice
+        React app
+      </p>
       <p>Exploring character cartridges and personas in virtual reality</p>
       <p>Finalizing trail challenge React-based mobile app</p>
     </Container>
