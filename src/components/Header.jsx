@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import Img from 'gatsby-image';
 import PropTypes from 'prop-types';
 
 import githubLogo from './github.png';
@@ -60,7 +59,7 @@ const Subtitle = styled.p`
   color: ${(props) => props.theme.colors.white.light};
 `;
 
-const Header = ({ children, title, date, cover }) => (
+const Header = ({ children, title, date }) => (
   <div>
     <Wrapper>
       <Text>
@@ -72,7 +71,8 @@ const Header = ({ children, title, date, cover }) => (
     </Wrapper>
     <SubHeader>
       <Quote>
-        Don't cry because it's over, smile because it happened. -Dr Seuss
+        Don&apos;t cry because it&apos;s over, smile because it happened. -Dr
+        Seuss
       </Quote>
       <span>
         <Link href="https://github.com/jagatfx" target="_blank">

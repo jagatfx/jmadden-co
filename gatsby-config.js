@@ -38,14 +38,7 @@ module.exports = {
         ],
       },
     },
-    {
-      resolve: 'gatsby-plugin-emotion',
-      options: {
-        autoLabel: process.env.NODE_ENV !== 'production',
-        // eslint-disable-next-line
-        labelFormat: `[filename]--[local]`,
-      },
-    },
+    'gatsby-plugin-emotion',
     {
       resolve: 'gatsby-plugin-typography',
       options: {

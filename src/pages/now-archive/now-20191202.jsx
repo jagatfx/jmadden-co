@@ -14,7 +14,7 @@ const ImageWrap = styled.img`
   padding-top: 10px;
 `;
 
-const Now = center => (
+const Now = (center) => (
   <Layout>
     <Helmet title={'Jacob Madden | Now'} />
     <Header title="Now"></Header>
@@ -31,8 +31,14 @@ const Now = center => (
 
       <h2>What I&#39;m Doing Right Now</h2>
 
-      <p>Working on a Costa Rica jungle VR experience where you experience life as different animals</p>
-      <p>Editing footage from our Azure Kinect real-time volumetric capture augmented reality dancer performances</p>
+      <p>
+        Working on a Costa Rica jungle VR experience where you experience life
+        as different animals
+      </p>
+      <p>
+        Editing footage from our Azure Kinect real-time volumetric capture
+        augmented reality dancer performances
+      </p>
       <p>Exploring virtual hand interactions on Oculus Quest</p>
       <p>Investigating health and wellness wearables and metrics</p>
       <p>Making a trail challenge app</p>
