@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "archive": "bun scripts/build-archive.ts"
+    "archive": "bun scripts/build-archive.ts && prettier --write src/content/archive-posts.ts"
   },
   "dependencies": {
     "next": "16.4.0",

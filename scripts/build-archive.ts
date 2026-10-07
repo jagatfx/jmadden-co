@@ -23,9 +23,16 @@ function frontmatter(src: string) {
   const m = src.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!m) throw new Error("missing frontmatter");
   const data: Record<string, string> = {};
+  let key = "";
   for (const line of m[1].split("\n")) {
     const i = line.indexOf(":");
-    if (i > 0) data[line.slice(0, i).trim()] = line.slice(i + 1).trim();
+    if (i > 0 && !/^\s/.test(line)) {
+      key = line.slice(0, i).trim();
+      data[key] = line.slice(i + 1).trim();
+    } else if (key) {
+      // Continuation of a value wrapped over several lines (e.g. tags).
+      data[key] += line.trim();
+    }
   }
   return { data, body: m[2] };
 }
@@ -44,18 +51,18 @@ const posts: Post[] = readdirSync(dir)
     const date = file.replace(".md", "");
     const { data, body } = frontmatter(readFileSync(join(dir, file), "utf8"));
     const tags = (data.tags ?? "")
-      .replace(/[[\]']/g, "")
+      .replace(/[[\]'"]/g, "")
       .split(",")
       .map((t) => t.trim())
       .filter(Boolean);
 
     const md = body
-      // Gatsby's `youtube:URL` shortcode.
-      .replace(/`youtube:(\S+?)`/g, (_, url) => embed(url))
       // Raw iframes: drop fixed sizes, make responsive.
       .replace(/<iframe[^>]*src="([^"]+)"[^>]*><\/iframe>/g, (_, url) =>
         embed(url),
       )
+      // Gatsby's `youtube:URL` shortcode.
+      .replace(/`youtube:(\S+?)`/g, (_, url) => embed(url))
       // Relative images were converted to webp under public/archive.
       .replace(
         /!\[([^\]]*)\]\(\.?\/?([\w-]+)\.(png|jpe?g|gif)\)/g,
