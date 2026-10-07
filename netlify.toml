@@ -4,5 +4,5 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "22"
+  NODE_VERSION = "24"
   BUN_VERSION = "1.4.2"
