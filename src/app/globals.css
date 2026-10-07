@@ -147,15 +147,19 @@ body::after {
   line-height: 1.2;
   margin-top: 2em;
 }
-.archive-prose a {
-  color: var(--cobalt);
+.archive-prose a,
+.ink-link {
+  color: inherit;
   text-decoration: underline;
+  text-decoration-color: var(--tomato);
   text-decoration-thickness: 2px;
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
+  transition: background-color 150ms ease;
 }
-.archive-prose a:hover {
+.archive-prose a:hover,
+.ink-link:hover {
   background: var(--sun);
-  color: var(--ink);
+  text-decoration-color: var(--ink);
 }
 .archive-prose img {
   width: 100%;

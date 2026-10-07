@@ -45,7 +45,7 @@ export default async function NotePage({
           href={note.xUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-10 inline-block font-medium text-cobalt underline"
+          className="ink-link mt-10 inline-block font-medium"
         >
           Discuss on X
         </a>
