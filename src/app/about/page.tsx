@@ -32,16 +32,27 @@ export default function AboutPage() {
               is to talk to someone.
             </p>
             <p>
-              I&apos;m also one of the active creators at{" "}
+              I also build{" "}
+              <a
+                href="https://www.firefolio.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ink-link"
+              >
+                Firefolio
+              </a>
+              , a lab for financial independence planning and market research,
+              where my trading-agent experiments live. And I&apos;m one of the
+              active creators at{" "}
               <a
                 href="https://www.showrunnerstudio.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-cobalt underline"
+                className="ink-link"
               >
                 Showrunner
               </a>
-              . Everything on this site is my own work outside it.
+              . Everything on this site is my own work outside both.
             </p>
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
