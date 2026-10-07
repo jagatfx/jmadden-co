@@ -17,8 +17,10 @@ jobs:
         with:
           args: >-
             --no-progress
+            --scheme https
+            --scheme http
             --max-retries 2
-            --timeout 20
+            --timeout 30
             --accept 200..=299,403,429,999
             --exclude-path src/content/archive-posts.ts
             'src/content/**/*.md'
