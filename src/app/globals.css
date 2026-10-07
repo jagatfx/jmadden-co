@@ -66,22 +66,6 @@ body::after {
   font-variation-settings: "SOFT" 100, "WONK" 1;
 }
 
-/* Duotone archive thumbnails: grayscale photo under a colored wash. */
-.duotone {
-  position: relative;
-  isolation: isolate;
-}
-.duotone img {
-  filter: grayscale(1) contrast(1.15);
-  mix-blend-mode: multiply;
-  transition: filter 300ms ease;
-}
-.duotone:hover img,
-.duotone:focus-visible img {
-  filter: none;
-  mix-blend-mode: normal;
-}
-
 /* Marquee for the lineage ticker. */
 @keyframes marquee {
   to {
@@ -144,4 +128,62 @@ body::after {
   .ripple {
     animation: none;
   }
+}
+
+/* Original write-ups from the 2015 to 2020 site. */
+.archive-prose {
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+.archive-prose > * + * {
+  margin-top: 1.25em;
+}
+.archive-prose h2,
+.archive-prose h3 {
+  font-family: var(--font-fraunces), serif;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  margin-top: 2em;
+}
+.archive-prose a {
+  color: var(--cobalt);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.archive-prose a:hover {
+  background: var(--sun);
+  color: var(--ink);
+}
+.archive-prose img {
+  width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  border: 3px solid var(--ink);
+  background: white;
+}
+.archive-prose ul {
+  list-style: disc;
+  padding-left: 1.5em;
+}
+.archive-prose ol {
+  list-style: decimal;
+  padding-left: 1.5em;
+}
+.archive-prose strong {
+  font-weight: 600;
+}
+.archive-prose .embed {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 3px solid var(--ink);
+  background: var(--night);
+}
+.archive-prose .embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }

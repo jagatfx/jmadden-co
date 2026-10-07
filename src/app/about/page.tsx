@@ -33,20 +33,20 @@ export default function AboutPage() {
             </p>
             <p>
               I&apos;m also one of the active creators at{" "}
-              <a href="https://www.showrunnerstudio.com/" className="text-cobalt underline">
+              <a href="https://www.showrunnerstudio.com/" target="_blank" rel="noopener noreferrer" className="text-cobalt underline">
                 Showrunner
               </a>
               . Everything on this site is my own work outside it.
             </p>
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
-            <a href={site.links.x} className="rounded-full bg-ink px-5 py-2.5 text-paper hover:bg-tomato">
+            <a href={site.links.x} target="_blank" rel="noopener noreferrer" className="rounded-full bg-ink px-5 py-2.5 text-paper hover:bg-tomato">
               @jagatfx on X
             </a>
-            <a href={site.links.github} className="rounded-full border-2 border-ink px-5 py-2 hover:bg-sun">
+            <a href={site.links.github} target="_blank" rel="noopener noreferrer" className="rounded-full border-2 border-ink px-5 py-2 hover:bg-sun">
               GitHub
             </a>
-            <a href={site.links.linkedin} className="rounded-full border-2 border-ink px-5 py-2 hover:bg-pink">
+            <a href={site.links.linkedin} target="_blank" rel="noopener noreferrer" className="rounded-full border-2 border-ink px-5 py-2 hover:bg-pink">
               LinkedIn
             </a>
           </div>
@@ -62,7 +62,7 @@ export default function AboutPage() {
         </aside>
       </div>
 
-      <section className="pt-24">
+      <section id="archive" className="scroll-mt-8 pt-24">
         <SectionLabel>Earlier work, 2015 to 2020</SectionLabel>
         <Archive />
       </section>

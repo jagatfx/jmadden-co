@@ -39,7 +39,7 @@ export default async function NotePage({ params }: PageProps<"/notebook/[slug]">
         ))}
       </div>
       {note.xUrl && (
-        <a href={note.xUrl} className="mt-10 inline-block font-medium text-cobalt underline">
+        <a href={note.xUrl} target="_blank" rel="noopener noreferrer" className="mt-10 inline-block font-medium text-cobalt underline">
           Discuss on X
         </a>
       )}

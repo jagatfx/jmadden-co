@@ -47,17 +47,17 @@ export function SiteFooter() {
         </p>
         <ul className="flex gap-6">
           <li>
-            <a href={site.links.x} className="hover:text-sun">
+            <a href={site.links.x} target="_blank" rel="noopener noreferrer" className="hover:text-sun">
               X
             </a>
           </li>
           <li>
-            <a href={site.links.github} className="hover:text-sun">
+            <a href={site.links.github} target="_blank" rel="noopener noreferrer" className="hover:text-sun">
               GitHub
             </a>
           </li>
           <li>
-            <a href={site.links.linkedin} className="hover:text-sun">
+            <a href={site.links.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-sun">
               LinkedIn
             </a>
           </li>

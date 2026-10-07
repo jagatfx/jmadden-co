@@ -1,0 +1,28 @@
+name: Check links
+
+on:
+  pull_request:
+    paths:
+      - "src/content/**"
+      - ".github/workflows/links.yml"
+  workflow_dispatch:
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check outbound links in content
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --max-retries 2
+            --timeout 20
+            --accept 200..=299,403,429,999
+            --exclude-path src/content/archive-posts.ts
+            'src/content/**/*.md'
+            'src/content/**/*.ts'
+          fail: true
+          format: markdown
+          jobSummary: true

@@ -29,9 +29,12 @@ export type Note = {
 
 export type LegacyItem = {
   date: string;
+  /** Slug of the full write-up in archive-posts.ts. */
+  slug: string;
   title: string;
   blurb: string;
   image: string;
+  /** The project's video, if there is one. */
   href?: string;
 };
 
