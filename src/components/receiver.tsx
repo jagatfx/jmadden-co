@@ -9,6 +9,8 @@ type Station = {
   line: string;
   /** Recorded line, played through the radio when the dial locks on. */
   clip?: string;
+  /** Skip the radio filter: ARC is in the room, not on the radio. */
+  clean?: boolean;
 };
 
 /** Five fragments of the film, hidden in the static. Positions are 0 to 1 across the band. */
@@ -31,7 +33,13 @@ const STATIONS: Station[] = [
     line: "Crew's under. Three of them. I'm the one who drew the short straw.",
     clip: "/last-signal/radio/ines-3.mp3",
   },
-  { f: 0.71, who: "ARC", line: "Debris risk was within tolerance." },
+  {
+    f: 0.71,
+    who: "ARC",
+    line: "Debris risk was within tolerance.",
+    clip: "/last-signal/radio/arc.mp3",
+    clean: true,
+  },
   {
     f: 0.9,
     who: "INES",
@@ -90,6 +98,7 @@ type Audio = {
   carrier: GainNode;
   master: GainNode;
   voice: GainNode;
+  cleanVoice: GainNode;
   clips: (AudioBuffer | null)[];
   playing: { index: number; src: AudioBufferSourceNode; gain: GainNode } | null;
 };
@@ -170,6 +179,9 @@ function startAudio(): Audio {
   }
   drive.curve = curve;
   voice.connect(hp).connect(lp).connect(drive).connect(master);
+  const cleanVoice = ctx.createGain();
+  cleanVoice.gain.value = 0;
+  cleanVoice.connect(master);
 
   return {
     ctx,
@@ -178,21 +190,49 @@ function startAudio(): Audio {
     carrier,
     master,
     voice,
+    cleanVoice,
     clips: STATIONS.map(() => null),
     playing: null,
   };
 }
 
-/** Pads a clip with silence so a looping source leaves a gap between repeats. */
-async function loadClip(ctx: AudioContext, url: string) {
+/** Two falling notes, like a cabin announcement, so ARC reads as the ship talking. */
+const CHIME: [number, number][] = [
+  [0, 1046.5],
+  [0.32, 784],
+];
+const CHIME_LEN = 1.05;
+
+/**
+ * Pads a clip with silence so a looping source leaves a gap between repeats.
+ * With `chime`, the announcement chime is written in front of the line.
+ */
+async function loadClip(ctx: AudioContext, url: string, chime = false) {
   const res = await fetch(url);
   const clip = await ctx.decodeAudioData(await res.arrayBuffer());
+  const sr = clip.sampleRate;
+  const lead = chime ? Math.round(CHIME_LEN * sr) : 0;
   const padded = ctx.createBuffer(
     1,
-    clip.length + Math.round(CLIP_GAP * clip.sampleRate),
-    clip.sampleRate,
+    lead + clip.length + Math.round(CLIP_GAP * sr),
+    sr,
   );
-  padded.copyToChannel(clip.getChannelData(0), 0);
+  if (chime) {
+    const out = padded.getChannelData(0);
+    for (const [at, f] of CHIME) {
+      const start = Math.round(at * sr);
+      for (let i = 0; i < 0.6 * sr; i++) {
+        const t = i / sr;
+        const env = Math.min(1, t / 0.005) * Math.exp(-t * 6);
+        out[start + i] +=
+          0.22 *
+          env *
+          (Math.sin(2 * Math.PI * f * t) +
+            0.3 * Math.sin(2 * Math.PI * f * 2 * t));
+      }
+    }
+  }
+  padded.copyToChannel(clip.getChannelData(0), 0, lead);
   return padded;
 }
 
@@ -335,7 +375,9 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
     );
     a.band.frequency.setTargetAtTime(400 + tune * 3200, now, 0.05);
     // Her voice fades up out of the static as the dial closes in.
-    a.voice.gain.setTargetAtTime(hasVoice ? 1.1 * lock * lock : 0, now, 0.08);
+    const level = hasVoice ? 1.1 * lock * lock : 0;
+    a.voice.gain.setTargetAtTime(level, now, 0.08);
+    a.cleanVoice.gain.setTargetAtTime(0.8 * level, now, 0.08);
   }, [tune, lock, sound, index, clipsReady]);
 
   // Start a station's recording once the dial is close, stop it when you tune away.
@@ -350,7 +392,7 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
       src.buffer = clip;
       src.loop = true;
       const gain = a.ctx.createGain();
-      src.connect(gain).connect(a.voice);
+      src.connect(gain).connect(STATIONS[want].clean ? a.cleanVoice : a.voice);
       src.start();
       a.playing = { index: want, src, gain };
     }
@@ -364,7 +406,7 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
       audioRef.current = a;
       STATIONS.forEach((s, i) => {
         if (!s.clip) return;
-        loadClip(a.ctx, s.clip)
+        loadClip(a.ctx, s.clip, s.who === "ARC")
           .then((buf) => {
             a.clips[i] = buf;
             setClipsReady((n) => n + 1);
