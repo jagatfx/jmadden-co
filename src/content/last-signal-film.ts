@@ -5,7 +5,7 @@
  */
 
 export type Cam =
-  "SEC-01" | "SEC-02" | "SEC-03" | "HELM" | "EXT" | "DISH" | "INSERT";
+  "SEC-01" | "SEC-02" | "SEC-03" | "COMMS" | "HELM" | "EXT" | "DISH" | "INSERT";
 
 export type Who = "INES" | "ARC" | "TEO";
 
@@ -722,6 +722,129 @@ export const SHOTS: Shot[] = [
   },
 ];
 
+/**
+ * The film's footage: video clips made by MiniMax H3 Max reference-to-video
+ * (fal), each from a shot's master still as Image 1, with Ines's character
+ * sheet as Images 2 and 3 when she's in it, and her recorded take as Audio 1
+ * when she speaks, so the clip's voice is hers. Clips are coverage, not
+ * shots: the editor trims them and cuts between them on the timeline below.
+ * Picture goes to clips/<id>.mp4 (silent) and production sound to
+ * clips/<id>.mp3, so sound can run over cuts.
+ */
+export type Clip = {
+  /** The shot whose still sets the frame, the set and the light. */
+  shot: string;
+  /** What the camera sees move and what the mic hears. */
+  motion: string;
+  seconds: number;
+  ines?: boolean;
+  /** The line whose take is the voice reference. */
+  voice?: string;
+};
+
+export const CLIP_STYLE =
+  "Shot on 35mm Kodak Vision3 500T, anamorphic lens, visible film grain, halation on practical lights. " +
+  "Grounded, lived-in hard sci-fi like Duncan Jones' Moon and Apollo 13. Naturalistic and underlit, no glossy CGI, no on-screen text, no music.";
+
+const INES_MOTION =
+  "The woman astronaut from Image 2 and Image 3: same face, worn grey flight suit with the orange-planet mission patch, dark hair tied back with loose strands floating weightless, dried blood at her left temple.";
+
+/** The comms camera: a small camera above the radio panel, for her close-ups. */
+const COMMS =
+  "A small camera mounted above the radio panel of the habitat in Image 1 looks back at her:";
+
+export const CLIPS: Record<string, Clip> = {
+  "01": {
+    shot: "01",
+    seconds: 7,
+    motion:
+      "Exactly the scene in Image 1: night in the Atacama desert, a lone white radio-telescope dish on bare rocky ground beside a small hut with one warm lit window, the Milky Way overhead, silhouetted Andes. Very slow push-in toward the hut across the rocks, as if on a dolly at ground level. The dish turns a few degrees on its mount with a mechanical groan; dust lifts off the ground in a gust; stars twinkle. Sound: cold desert wind, the faint creak of the dish motor.",
+  },
+  "02": {
+    shot: "02",
+    seconds: 6,
+    motion:
+      "Exactly the room in Image 1: a small 1970s radio-telescope control hut at night, beige consoles with analog meters, a chipped enamel mug, an empty swivel chair facing a wall-mounted speaker grille, one desk lamp, the pale dish through the window under dense stars. Nobody is here. Slow creeping push-in toward the empty chair and the speaker. The analog meter needles twitch and jump; the desk lamp flickers once; the speaker crackles with rising static. The chair turns a few degrees on its own in the draft. Sound: wind against the hut, static crackling from the speaker, a faint electrical buzz. No voices.",
+  },
+  "03": {
+    shot: "03",
+    seconds: 7,
+    motion:
+      "Exactly the spacecraft in Image 1, a practical model miniature: the survey ship Perihelion, a long truss with a cylindrical habitat and a ring, scorched beige panels. It tumbles slowly end over end against black space, lit hard from one side by a distant sun so the shadows sweep across the hull as it turns. A halo of small debris glints and drifts past the camera. One red running light blinks steadily. Locked-off long-lens camera, like a model shot in 2001 or Moon. Sound: near silence, a low muffled rumble.",
+  },
+  "03w": {
+    shot: "03",
+    seconds: 5,
+    motion:
+      "Exactly the spacecraft in Image 1, a practical model miniature, scorched beige panels. Slow long-lens push in toward the habitat cylinder as it rolls past camera; one small porthole glows with dim amber light from inside; out-of-focus debris drifts across close to the lens; one red running light blinks. Sound: near silence, a muffled creak of metal.",
+  },
+  "04": {
+    shot: "04",
+    seconds: 7,
+    ines: true,
+    voice: "04",
+    motion: `Fixed high-corner security camera, completely locked off, slight wide-angle distortion, looking down into a cramped, dim spacecraft habitat module exactly as in Image 1: amber emergency lights, cluttered beige consoles, taped cables, checklist pages drifting weightless, a porthole of stars. ${INES_MOTION} She drifts weightless into frame from the left, catches a handhold, pulls a chunky radio handset on a coiled cord to her mouth and presses the push-to-talk key. Tired, urgent, she says in the voice of Audio 1: "Any station, this is Perihelion. Any station." Then she waits, listening, the cord swaying. Sound: low ship hum, radio static hiss, the click of the PTT key.`,
+  },
+  "04k": {
+    shot: "04",
+    seconds: 5,
+    motion:
+      "Insert shot. Extreme close-up, macro lens, very shallow focus, locked off: a woman's thumb presses the rubber push-to-talk key on a chunky, scuffed beige radio handset with a coiled cord, and a small red TX lamp on the handset lights up. The cramped amber-lit habitat from Image 1 is a soft blur behind. Sound: the hard click of the key, then a burst of radio static.",
+  },
+  "05c": {
+    shot: "06",
+    seconds: 6,
+    ines: true,
+    voice: "05",
+    motion: `${COMMS} close-up at eye level, slight wide angle, locked off. ${INES_MOTION} She hangs weightless in front of the panel, her face lit amber from below by the radio's dial lamps, listening hard to static. The hiss changes; her eyes widen; she leans in toward the lens and whispers in the voice of Audio 1: "Somebody's there." A pause. "I can hear the hiss change." Sound: radio static that shifts in texture, ship hum.`,
+  },
+  "06": {
+    shot: "06",
+    seconds: 7,
+    ines: true,
+    voice: "06",
+    motion: `Exactly the framing of Image 1: fixed high-corner security camera, slight wide-angle distortion, tighter on the cramped habitat. ${INES_MOTION} She pulls herself hand over hand to the wall-mounted radio mic, eyes searching, wary and hopeful, and says in the voice of Audio 1, low and wary: "Who is this?" A beat. "You're not Houston." Amber emergency light on her face, blue starlight from the porthole behind her. Sound: ship hum, faint radio hiss.`,
+  },
+  "07": {
+    shot: "07",
+    seconds: 7,
+    motion:
+      "Exactly the cryobay in Image 1, fixed security camera angle: three frosted cryosleep pods in a row, hard beige plastic with steel fittings, a porthole, blue cold light, taped labels. Nobody is awake. Frost slowly crawls up the glass of the pods; the faces inside are barely visible, utterly still. The green status lights pulse slowly. A loose checklist page drifts weightless across the frame. Locked-off camera. Sound: cold low hum, the soft tick of the pods' pumps. No voices.",
+  },
+  "08": {
+    shot: "08",
+    seconds: 6,
+    motion:
+      "Exactly the scene in Image 1: first-person helmet camera, slight fisheye, handheld and shaky, a gloved hand in the foreground. Entering a cramped spacecraft greenhouse module: tomato plants and lettuce in grow trays, leaves and soil whipping violently toward a fist-sized hole in the hull wall, white sealant foam spraying from a nozzle and failing, being sucked out, purple-pink grow lights flickering, frost forming across the panels. The gloved hand reaches for a rail. Sound: roaring air escaping, a shrill pressure alarm, rattling trays, heavy breathing inside a helmet.",
+  },
+  "08s": {
+    shot: "08",
+    seconds: 6,
+    motion:
+      "Fixed security camera high in a corner of the cramped spacecraft greenhouse from Image 1, slight wide-angle distortion, slightly desaturated: rows of tomato plants and lettuce in grow trays, leaves and soil streaming toward a fist-sized hole in the hull wall, white sealant foam spraying and failing, purple-pink grow lights flickering, frost spreading across the panels. The hatch at the near end swings open and an astronaut in a pressure-suit helmet pulls herself in hand over hand, braced against the gale. Sound: roaring escaping air, a shrill pressure alarm, rattling trays.",
+  },
+  "09": {
+    shot: "09",
+    seconds: 8,
+    ines: true,
+    motion: `Exactly the framing of Image 1: fixed high-corner security camera looking down into the habitat. ${INES_MOTION} She is busy at a console, then stops mid-task, and slowly lifts her eyes straight up into the security camera lens with open distrust. She holds the look, saying nothing, her jaw tight. Amber light. She does not speak. Sound: ship hum.`,
+  },
+  "10": {
+    shot: "10",
+    seconds: 10,
+    ines: true,
+    voice: "10",
+    motion: `Exactly the framing of Image 1: close on her from the security camera. ${INES_MOTION} She looks just past the camera at the radio, steady and quiet, and says in the voice of Audio 1: "I can seal it and lose everything we've grown. Or I go outside and patch it." A beat. "ARC says seal." Softer: "What would you do?" Then she waits for an answer, barely moving, breathing, hair drifting. Amber light from below, blue rim light from the porthole. Sound: ship hum, faint radio hiss.`,
+  },
+  "10c": {
+    shot: "10",
+    seconds: 8,
+    ines: true,
+    voice: "10",
+    motion: `${COMMS} tight close-up at eye level, locked off. ${INES_MOTION} She looks straight into the lens, steady, and says quietly in the voice of Audio 1: "ARC says seal." A beat. Softer: "What would you do?" Then she holds the look, waiting for an answer, barely moving, breathing, blinking once, loose hair drifting. Amber light from below, blue rim light from a porthole. Sound: ship hum, low radio hiss.`,
+  },
+};
+
 export const shot = (id: string) => {
   const s = SHOTS.find((x) => x.id === id);
   if (!s) throw new Error(`No shot ${id}`);
@@ -742,6 +865,139 @@ export const REELS = {
   signal: ["S1", "S2", "S3", "S4", "S5"],
   static: ["T1", "T2", "T3", "T4"],
 } as const;
+
+/** Which score layer is up. */
+export type Mood = "ambient" | "tension" | "resolve" | "silence";
+
+/**
+ * One cut on the picture track: a clip from its `in` point, a shot's still
+ * with a slow camera move, or a live ship screen. Cuts are hard unless they
+ * say `dissolve`.
+ */
+export type Cut = {
+  /** For the camera overlay, grade and alt text. */
+  shot: string;
+  /** When the coverage is from another camera than the shot's. */
+  cam?: Cam;
+  clip?: string;
+  /** Source seconds into the clip where the cut starts. */
+  in?: number;
+  dur: number;
+  title?: string;
+  dissolve?: boolean;
+};
+
+/**
+ * Sound on the timeline, `at` seconds into the sequence. Sound is laid on its
+ * own tracks, so it runs over cuts: a line can start on one shot and land on
+ * the next, and a clip's sync sound keeps playing under an insert.
+ */
+export type Cue =
+  /** A clip's production sound: lip sync, room tone. */
+  | {
+      kind: "sync";
+      at: number;
+      clip: string;
+      in?: number;
+      dur?: number;
+      gain?: number;
+    }
+  /** A recorded take, with subtitles. `open` takes Ines off the radio. */
+  | { kind: "line"; at: number; line: string; open?: boolean }
+  /** Subtitles for a line the picture speaks in sync sound. */
+  | { kind: "sub"; at: number; line: string; dur: number }
+  | { kind: "fx"; at: number; sfx: string; dur?: number; gain?: number }
+  | { kind: "mood"; at: number; mood: Mood };
+
+export type Sequence = { cuts: (Cut & { at: number })[]; cues: Cue[] };
+
+/** Lays cuts end to end, so an edit reads as a list of durations. */
+const edit = (cuts: Cut[], cues: Cue[]): Sequence => {
+  let at = 0;
+  return {
+    cuts: cuts.map((c) => {
+      const placed = { ...c, at };
+      at += c.dur;
+      return placed;
+    }),
+    cues,
+  };
+};
+
+/**
+ * The reels that have been cut from footage. Reels not here still play as
+ * stills, one shot after another.
+ */
+export const CUTS: Partial<Record<keyof typeof REELS, Sequence>> = {
+  // Wide to close, Earth to ship. The hut's static bleeds into space, the
+  // ship's hum arrives before we're inside, and her first words carry over
+  // the insert of her thumb on the key.
+  open: edit(
+    [
+      {
+        shot: "01",
+        clip: "01",
+        in: 0,
+        dur: 6.5,
+        title: "Atacama Desert, Chile · 03:12",
+      },
+      { shot: "02", clip: "02", in: 0.5, dur: 5 },
+      {
+        shot: "03",
+        clip: "03",
+        in: 0,
+        dur: 5.5,
+        title: "Perihelion · 9.4 AU from home",
+      },
+      { shot: "03", clip: "03w", in: 0, dur: 4 },
+      { shot: "04", clip: "04", in: 0, dur: 2.8 },
+      { shot: "04", cam: "INSERT", clip: "04k", in: 2, dur: 1.4 },
+      { shot: "04", clip: "04", in: 4.2, dur: 3.1 },
+      { shot: "05", dur: 2 },
+      { shot: "06", cam: "COMMS", clip: "05c", in: 1.6, dur: 4.8 },
+      { shot: "06", clip: "06", in: 0.8, dur: 6.5 },
+    ],
+    [
+      { kind: "mood", at: 0, mood: "ambient" },
+      { kind: "fx", at: 0, sfx: "wind", dur: 12 },
+      { kind: "sync", at: 6.5, clip: "02", in: 0.5, dur: 5.6 },
+      { kind: "fx", at: 15, sfx: "hum", dur: 26.6, gain: 0.5 },
+      { kind: "sync", at: 21, clip: "04", in: 0 },
+      { kind: "sync", at: 23.8, clip: "04k", in: 2, dur: 1.4, gain: 0.7 },
+      { kind: "sub", at: 24.3, line: "04", dur: 4 },
+      { kind: "sync", at: 29.3, clip: "05c", in: 0.6 },
+      { kind: "sub", at: 31.1, line: "05", dur: 3.9 },
+      { kind: "sync", at: 35.1, clip: "06", in: 0.8 },
+      { kind: "sub", at: 35.8, line: "06", dur: 5.4 },
+    ],
+  ),
+  // Her voice over the sleeping crew, then a smash cut on the alarm. ARC's
+  // chime cuts through the venting before we see her look up at it, and the
+  // question lands in close-up, looking at you.
+  act1: edit(
+    [
+      { shot: "07", clip: "07", in: 0.3, dur: 6.2 },
+      { shot: "08", cam: "SEC-03", clip: "08s", in: 3.2, dur: 3 },
+      { shot: "08", clip: "08", in: 0.4, dur: 4 },
+      { shot: "09", clip: "09", in: 0.3, dur: 7 },
+      { shot: "10", clip: "10", in: 0, dur: 8.5 },
+      { shot: "10", cam: "COMMS", clip: "10c", in: 6.2, dur: 1.8 },
+    ],
+    [
+      { kind: "fx", at: 0, sfx: "hum", dur: 6.2, gain: 0.5 },
+      { kind: "line", at: 0.6, line: "07" },
+      { kind: "mood", at: 6, mood: "tension" },
+      { kind: "fx", at: 6, sfx: "venting", dur: 7.2 },
+      { kind: "fx", at: 6.2, sfx: "alert", gain: 0.6 },
+      { kind: "fx", at: 9.2, sfx: "breathing", dur: 4 },
+      { kind: "line", at: 12.2, line: "09" },
+      { kind: "fx", at: 13.2, sfx: "hum", dur: 7, gain: 0.5 },
+      { kind: "sync", at: 20.2, clip: "10", in: 0, dur: 8.6 },
+      { kind: "sub", at: 20.4, line: "10", dur: 9.4 },
+      { kind: "sync", at: 28.7, clip: "10c", in: 6.2 },
+    ],
+  ),
+};
 
 export const HOLDS: Record<HoldId, Hold> = {
   hello: {
@@ -862,6 +1118,12 @@ export const HOLDS: Record<HoldId, Hold> = {
       read: "[pleading, quiet] I need you to pick. [beat] The burn, or the data?",
     },
   },
+};
+
+export const line = (id: string) => {
+  const l = allLines().find((x) => x.id === id);
+  if (!l) throw new Error(`No line ${id}`);
+  return l;
 };
 
 /** Every recorded line: the shots' and the holds' replies. */
