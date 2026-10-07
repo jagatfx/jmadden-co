@@ -4,6 +4,7 @@ import { site } from "@/lib/format";
 const NAV = [
   { href: "/work/last-signal", label: "Last Signal" },
   { href: "/notebook", label: "Notebook" },
+  { href: "/now", label: "Now" },
   { href: "/about", label: "About" },
 ];
 
