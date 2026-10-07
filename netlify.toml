@@ -1,0 +1,8 @@
+# Next.js 16 build; Netlify's Next.js runtime is applied automatically.
+[build]
+  command = "bun install && bun run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  BUN_VERSION = "1.4.2"
