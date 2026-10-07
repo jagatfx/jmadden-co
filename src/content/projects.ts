@@ -8,6 +8,7 @@ export const projects: Project[] = [
     date: "2026-10-16",
     shipped: false,
     tools: [
+      { name: "ChatGPT Images" },
       { name: "Veo 3.1" },
       { name: "Kling" },
       { name: "ElevenLabs Eleven v4" },

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Archive } from "@/components/archive";
 import { Lineage } from "@/components/lineage";
@@ -75,15 +76,26 @@ export default function Home() {
             </h2>
             <p className="mt-6 max-w-xl text-xl leading-relaxed">{film.hook}</p>
 
-            <figure className="mt-10 max-w-xl rounded-3xl bg-paper p-6 text-ink">
-              <figcaption className="font-mono text-[11px] tracking-[0.2em] text-tomato uppercase">
-                From the character brief
-              </figcaption>
-              <blockquote className="mt-3 font-display text-xl leading-snug italic">
-                Ines Varga, flight engineer, 41, four hours of sleep, alone and
-                awake on a damaged ship. Dry and steady. Short sentences. Goes
-                quiet when she is scared. She can be persuaded, but not bullied.
-              </blockquote>
+            <figure className="mt-10 grid max-w-xl gap-5 rounded-3xl bg-paper p-6 text-ink sm:grid-cols-[8rem_1fr]">
+              <Image
+                src="/last-signal/ines.webp"
+                alt="Ines Varga, a tired woman in her forties with dark hair tied back, in a grey flight suit with a mission patch"
+                width={800}
+                height={800}
+                sizes="8rem"
+                className="size-32 -rotate-3 rounded-2xl object-cover shadow-[5px_5px_0_var(--tomato)]"
+              />
+              <div>
+                <figcaption className="font-mono text-[11px] tracking-[0.2em] text-tomato uppercase">
+                  From the character brief
+                </figcaption>
+                <blockquote className="mt-3 font-display text-xl leading-snug italic">
+                  Ines Varga, flight engineer, 41, four hours of sleep, alone
+                  and awake on a damaged ship. Dry and steady. Short sentences.
+                  Goes quiet when she is scared. She can be persuaded, but not
+                  bullied.
+                </blockquote>
+              </div>
             </figure>
 
             <Link

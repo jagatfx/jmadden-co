@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Poster } from "@/components/poster";
 import { Receiver } from "@/components/receiver";
@@ -36,7 +37,11 @@ const PROGRESS: { date: string; what: string; done: boolean }[] = [
     what: "Radio teaser, playable on the homepage",
     done: true,
   },
-  { date: "2026-10-09", what: "Look frames and Ines's voice", done: false },
+  {
+    date: "2026-10-07",
+    what: "Ines's face, wardrobe and voice",
+    done: true,
+  },
   {
     date: "2026-10-12",
     what: "All 48 shots generated and reviewed",
@@ -73,6 +78,29 @@ export default async function WorkPage({ params }: PageProps<"/work/[slug]">) {
         </div>
         <Poster className="mx-auto block h-auto w-full max-w-xs rotate-2 shadow-[10px_10px_0_var(--cobalt)]" />
       </header>
+
+      <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-8">
+        <SectionLabel>Meet Ines</SectionLabel>
+        <h2 className="max-w-3xl font-display text-4xl leading-tight sm:text-5xl">
+          Flight engineer, 41, four hours of sleep.
+        </h2>
+        <p className="mt-4 mb-10 max-w-2xl text-lg text-ink-soft">
+          Her character sheet: the same face, suit and patch from every angle,
+          so 48 generated shots still add up to one person. Neutral, the closest
+          she gets to a smile, and what scared looks like on someone who goes
+          quiet.
+        </p>
+        <figure className="overflow-hidden rounded-3xl border-2 border-ink shadow-[10px_10px_0_var(--sun)]">
+          <Image
+            src="/last-signal/ines-sheet.webp"
+            alt="Character sheet for Ines Varga: front, three-quarter, side and back views in a worn grey flight suit with tool belt and gloves, plus close-ups of her face looking neutral, faintly amused and worried"
+            width={1672}
+            height={941}
+            sizes="(min-width: 72rem) 72rem, 100vw"
+            className="h-auto w-full"
+          />
+        </figure>
+      </section>
 
       <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-8">
         <SectionLabel>The map</SectionLabel>
