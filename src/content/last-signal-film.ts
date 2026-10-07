@@ -728,8 +728,9 @@ export const SHOTS: Shot[] = [
  * sheet as Images 2 and 3 when she's in it, and her recorded take as Audio 1
  * when she speaks, so the clip's voice is hers. Clips are coverage, not
  * shots: the editor trims them and cuts between them on the timeline below.
- * Picture goes to clips/<id>.mp4 (silent) and production sound to
- * clips/<id>.mp3, so sound can run over cuts.
+ * Production sound goes to clips/<id>.mp3, so sound can run over cuts. The
+ * picture (silent) is encoded to clips/<id>.mp4, which stays out of git and
+ * plays from Cloudflare Stream (see last-signal-stream.ts).
  */
 export type Clip = {
   /** The shot whose still sets the frame, the set and the light. */

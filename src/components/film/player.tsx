@@ -19,6 +19,7 @@ import {
   type Sequence,
   type Shot,
 } from "@/content/last-signal-film";
+import { clipSrc } from "@/content/last-signal-stream";
 import { read, TRUSTED } from "@/lib/last-signal-intent";
 import { InsertScreen } from "./inserts";
 import { listen, primeMic, speechSupported } from "./listen";
@@ -179,7 +180,9 @@ export function FilmPlayer() {
       if (signal.aborted) return;
       const seq = CUTS[name] ?? (await fromShots(REELS[name], sound));
       const both = skippable();
-      const clips = [...new Set(seq.cuts.flatMap((c) => c.clip ?? []))];
+      const clips = [
+        ...new Set(seq.cuts.flatMap((c) => (c.clip && clipSrc(c.clip)) || [])),
+      ];
       setUpcoming(clips);
       // Sync sound has to be in hand before the clock starts, or it drifts.
       const syncs = seq.cues.flatMap((c) => (c.kind === "sync" ? c.clip : []));
@@ -375,7 +378,7 @@ export function FilmPlayer() {
             {/* The reel's footage, loading ahead of its cuts. */}
             <div hidden>
               {upcoming.map((c) => (
-                <video key={c} src={clipSrc(c)} preload="auto" muted />
+                <video key={c} src={c} preload="auto" muted />
               ))}
             </div>
             {phase === "film" && s && (
@@ -451,7 +454,6 @@ function prefetchAfter(id: string) {
 }
 
 const shotSrc = (id: string) => `/last-signal/film/shots/${id}.webp`;
-const clipSrc = (id: string) => `/last-signal/film/clips/${id}.mp4`;
 
 /**
  * Builds a timeline for a reel that hasn't been cut from footage yet: each
@@ -518,12 +520,13 @@ function Frame({
         : "";
   const cam = cut.cam ?? s.cam;
   const sec = cam.startsWith("SEC") || cam === "COMMS" ? "saturate-[0.82]" : "";
+  const src = cut.clip && clipSrc(cut.clip);
   return (
     <div
       className={`absolute inset-0 overflow-hidden ${top ? `${cut.dissolve ? "film-in" : ""} z-10` : "z-0"} after:absolute after:inset-0 ${grade}`}
     >
-      {cut.clip ? (
-        <ClipVideo cut={cut} clock={clock} className={sec} />
+      {src ? (
+        <ClipVideo cut={cut} src={src} clock={clock} className={sec} />
       ) : s.insert ? (
         <InsertScreen kind={s.insert} seconds={cut.dur} />
       ) : (
@@ -557,10 +560,12 @@ function Frame({
  */
 function ClipVideo({
   cut,
+  src,
   clock,
   className,
 }: {
   cut: OnScreen;
+  src: string;
   clock: () => number;
   className: string;
 }) {
@@ -584,7 +589,7 @@ function ClipVideo({
   return (
     <video
       ref={ref}
-      src={clipSrc(cut.clip!)}
+      src={src}
       aria-label={shot(cut.shot).action}
       muted
       playsInline
