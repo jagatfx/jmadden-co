@@ -23,23 +23,23 @@ export default async function NotePage({ params }: PageProps<"/notebook/[slug]">
   if (!note) notFound();
 
   return (
-    <article className="mx-auto max-w-2xl pt-10">
+    <article className="mx-auto max-w-2xl px-4 pt-8 sm:px-0">
       <Link
         href="/notebook"
-        className="font-mono text-xs tracking-[0.14em] text-muted uppercase hover:text-fg"
+        className="font-mono text-xs tracking-[0.15em] text-tomato uppercase hover:underline"
       >
-        Notebook / {formatDate(note.date)}
+        Notebook · {formatDate(note.date)}
       </Link>
-      <h1 className="mt-4 font-display text-5xl leading-tight tracking-tight">
+      <h1 className="mt-4 font-display text-5xl leading-tight tracking-tight sm:text-6xl">
         {note.title}
       </h1>
-      <div className="mt-10 space-y-6 text-lg leading-relaxed">
+      <div className="mt-10 space-y-6 text-xl leading-relaxed first-letter:float-left first-letter:mr-3 first-letter:font-display first-letter:text-7xl first-letter:leading-[0.8] first-letter:text-tomato">
         {note.body.map((p) => (
           <p key={p}>{p}</p>
         ))}
       </div>
       {note.xUrl && (
-        <a href={note.xUrl} className="mt-10 inline-block text-accent hover:underline">
+        <a href={note.xUrl} className="mt-10 inline-block font-medium text-cobalt underline">
           Discuss on X
         </a>
       )}

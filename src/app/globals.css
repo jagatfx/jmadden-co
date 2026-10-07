@@ -1,75 +1,147 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0c0b0a;
-  --bg-raised: #15130f;
-  --fg: #ede7dd;
-  --fg-muted: #a39b90;
-  --line: #2b2722;
-  --accent: #e9a64a;
-  --accent-dim: #e9a64a26;
-  color-scheme: dark;
+  --paper: #f4ecdc;
+  --paper-deep: #eadfc9;
+  --ink: #1d1a16;
+  --ink-soft: #5a5247;
+  --line: #d6c9b0;
+  --tomato: #e8462e;
+  --cobalt: #2347d6;
+  --sun: #f6b733;
+  --teal: #1f9b8a;
+  --plum: #6d2e63;
+  --pink: #f08bb4;
+  --night: #0f1020;
+  --phosphor: #ffcf6b;
 }
 
 @theme inline {
-  --color-bg: var(--bg);
-  --color-bg-raised: var(--bg-raised);
-  --color-fg: var(--fg);
-  --color-muted: var(--fg-muted);
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
   --color-line: var(--line);
-  --color-accent: var(--accent);
-  --color-accent-dim: var(--accent-dim);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-instrument-serif);
+  --color-tomato: var(--tomato);
+  --color-cobalt: var(--cobalt);
+  --color-sun: var(--sun);
+  --color-teal: var(--teal);
+  --color-plum: var(--plum);
+  --color-pink: var(--pink);
+  --color-night: var(--night);
+  --color-phosphor: var(--phosphor);
+  --font-sans: var(--font-instrument-sans);
+  --font-mono: var(--font-plex-mono);
+  --font-display: var(--font-fraunces);
 }
 
 html {
-  background: var(--bg);
+  background: var(--paper);
 }
 
 body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-instrument-sans), system-ui, sans-serif;
 }
 
 ::selection {
-  background: var(--accent);
-  color: var(--bg);
+  background: var(--sun);
+  color: var(--ink);
 }
 
-/* Film grain over everything; purely decorative. */
+/* Paper grain over everything; purely decorative. */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  z-index: 50;
+  opacity: 0.07;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  z-index: 60;
 }
 
-@keyframes signal {
+.font-display {
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+}
+
+/* Duotone archive thumbnails: grayscale photo under a colored wash. */
+.duotone {
+  position: relative;
+  isolation: isolate;
+}
+.duotone img {
+  filter: grayscale(1) contrast(1.15);
+  mix-blend-mode: multiply;
+  transition: filter 300ms ease;
+}
+.duotone:hover img,
+.duotone:focus-visible img {
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+/* Marquee for the lineage ticker. */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  animation: marquee 40s linear infinite;
+}
+
+@keyframes drift {
   0%,
   100% {
-    transform: scaleY(0.25);
-    opacity: 0.4;
+    transform: translate(0, 0) rotate(-8deg);
   }
   50% {
-    transform: scaleY(1);
-    opacity: 1;
+    transform: translate(6px, -10px) rotate(4deg);
   }
 }
+.drift {
+  animation: drift 9s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
 
-.signal-bar {
-  transform-origin: bottom;
-  animation: signal 1.6s ease-in-out infinite;
+@keyframes blink {
+  0%,
+  88%,
+  100% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 0.15;
+  }
+}
+.blink {
+  animation: blink 2.4s steps(1) infinite;
+}
+
+@keyframes ripple {
+  from {
+    opacity: 0.9;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+.ripple {
+  animation: ripple 3s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .signal-bar {
+  .marquee,
+  .drift,
+  .blink,
+  .ripple {
     animation: none;
-    opacity: 0.7;
   }
 }

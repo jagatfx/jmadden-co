@@ -24,7 +24,7 @@ export const site = {
   name: "Jacob Madden",
   url: "https://www.jmadden.co",
   tagline:
-    "Creative technologist building AI films, the agents that make them, and the tools in between.",
+    "Jacob Madden makes films you can talk to, and the AI tools that make them. Currently: Last Signal.",
   links: {
     x: "https://x.com/jagatfx",
     github: "https://github.com/jagatfx",

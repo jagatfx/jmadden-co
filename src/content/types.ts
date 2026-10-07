@@ -1,56 +1,21 @@
-export type Status = "live" | "in-production" | "planned";
-
 export type Media =
   | { kind: "video"; src: string; poster?: string; caption?: string }
   | { kind: "image"; src: string; alt: string; caption?: string }
-  | { kind: "embed"; src: string; title: string; caption?: string }
-  | { kind: "placeholder"; label: string };
+  | { kind: "embed"; src: string; title: string; caption?: string };
 
 export type Tool = { name: string; url?: string };
 
 export type Project = {
   slug: string;
   title: string;
-  /** One line: what it is and why it could not exist two years ago. */
+  /** One line: what it is. */
   hook: string;
-  status: Status;
   /** ISO date the piece ships or shipped. */
   date: string;
-  hero: Media;
-  tryIt?: { label: string; href: string };
-  areas: AreaSlug[];
+  shipped: boolean;
   tools: Tool[];
-  /** The technical move: models, architecture, one hard problem solved. */
+  /** The technical and creative moves, one per line. */
   how: string[];
-  /** Metrics, reactions, before and after. Empty until the piece ships. */
-  proof: string[];
-  /** Two or three sentences on where this goes next. */
-  next: string;
-  flagship?: boolean;
-};
-
-export type AreaSlug =
-  | "storytelling"
-  | "image-video"
-  | "3d"
-  | "voice"
-  | "music"
-  | "games"
-  | "web-apps"
-  | "agents"
-  | "productivity"
-  | "writing"
-  | "coding"
-  | "world-models"
-  | "dynamic-narrative"
-  | "conversational"
-  | "quant";
-
-export type Area = {
-  slug: AreaSlug;
-  title: string;
-  /** One-sentence point of view on where the area is going. */
-  thesis: string;
 };
 
 export type Note = {
@@ -62,4 +27,20 @@ export type Note = {
   xUrl?: string;
 };
 
-export type LegacyItem = { date: string; title: string };
+export type LegacyItem = {
+  date: string;
+  title: string;
+  blurb: string;
+  image: string;
+  href?: string;
+};
+
+export type Ancestor = {
+  year: number;
+  title: string;
+  by: string;
+  medium: "film" | "book" | "radio" | "tv" | "story";
+  /** What Last Signal took from it, with a wink. */
+  took: string;
+  color: "tomato" | "cobalt" | "sun" | "teal" | "plum" | "pink";
+};

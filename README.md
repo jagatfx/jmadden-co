@@ -19,12 +19,14 @@ All content is typed data in `src/content/`, so adding work never touches page c
 
 | File | What it holds |
 | --- | --- |
-| `projects.ts` | Case studies: hook, status, ship date, hero media, tools, how it works, proof, what's next |
-| `areas.ts` | The 15 areas, each with a one-line thesis |
+| `projects.ts` | Case studies: hook, ship date, tools, how it works |
+| `lineage.ts` | Last Signal's family tree of films, books, and broadcasts |
 | `notes.ts` | Lab notebook entries, newest first |
-| `legacy.ts` | Earlier work (2015 to 2020), listed on the About page |
+| `legacy.ts` | Earlier work (2015 to 2020) with cover images in `public/archive/` |
 
-To ship a piece, set its `status` to `"live"`, replace the `placeholder` hero with a `video`, `image`, or `embed`, and fill in `proof`. Media files go in `public/`.
+Nothing goes on the site as a placeholder. A piece appears once there is something real to show, even if it is a work in progress.
+
+The homepage radio (`src/components/receiver.tsx`) is a canvas waterfall plus Web Audio synthesis; the five lines it hides are in its `STATIONS` list.
 
 ## Deploy
 
