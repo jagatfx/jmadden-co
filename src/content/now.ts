@@ -9,7 +9,7 @@ export const motto = "Embracing the now, for it is all we have.";
 
 export const now: NowSnapshot = {
   updated: "2026-10-07",
-  location: "TODO",
+  location: "Nomadic, mostly East Tennessee and South Florida",
   sections: [
     {
       heading: "Making",
@@ -22,7 +22,26 @@ export const now: NowSnapshot = {
     {
       heading: "Writing",
       items: [
+        "Articles on financial independence for Firefolio.",
         "A daily build log on X and in the notebook here, until the premiere.",
+      ],
+    },
+    {
+      heading: "Reading",
+      items: ["Other Worlds Than These, by Stephen King and Peter Straub."],
+    },
+    {
+      heading: "On repeat",
+      items: [
+        "The O My Beloved tracks Kings of Leon are releasing ahead of the full record.",
+      ],
+    },
+    {
+      heading: "Learning",
+      items: [
+        "Bouldering.",
+        "Ecuadorian Highlands Kichwa.",
+        "How to set up a free library in Ecuador.",
       ],
     },
   ],
