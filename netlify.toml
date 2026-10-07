@@ -1,8 +1,10 @@
 # Next.js 16 build; Netlify's Next.js runtime is applied automatically.
 [build]
-  command = "bun install && bun run build"
+  # Site media is in Git LFS: fetch it, then refuse to build if any is missing.
+  command = "git lfs install --local && git lfs pull && bun install && bun run check-media && bun run build"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "24"
   BUN_VERSION = "1.4.2"
+  GIT_LFS_ENABLED = "true"
