@@ -3,7 +3,15 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type Station = { f: number; who: "INES" | "ARC" | "TEO"; line: string };
+type Station = {
+  f: number;
+  who: "INES" | "ARC" | "TEO";
+  line: string;
+  /** Recorded line, played through the radio when the dial locks on. */
+  clip?: string;
+  /** Skip the radio filter: ARC is in the room, not on the radio. */
+  clean?: boolean;
+};
 
 /** Five fragments of the film, hidden in the static. Positions are 0 to 1 across the band. */
 const STATIONS: Station[] = [
@@ -11,19 +19,33 @@ const STATIONS: Station[] = [
     f: 0.13,
     who: "INES",
     line: "Any station, this is Perihelion. Any station.",
+    clip: "/last-signal/radio/ines-1.mp3",
   },
   {
     f: 0.31,
     who: "INES",
     line: "Somebody's there. I can hear the hiss change.",
+    clip: "/last-signal/radio/ines-2.mp3",
   },
   {
     f: 0.52,
     who: "INES",
     line: "Crew's under. Three of them. I'm the one who drew the short straw.",
+    clip: "/last-signal/radio/ines-3.mp3",
   },
-  { f: 0.71, who: "ARC", line: "Debris risk was within tolerance." },
-  { f: 0.9, who: "INES", line: "Talk to me. I'm not doing this one alone." },
+  {
+    f: 0.71,
+    who: "ARC",
+    line: "Debris risk was within tolerance.",
+    clip: "/last-signal/radio/arc.mp3",
+    clean: true,
+  },
+  {
+    f: 0.9,
+    who: "INES",
+    line: "Talk to me. I'm not doing this one alone.",
+    clip: "/last-signal/radio/ines-4.mp3",
+  },
 ];
 
 const BAND_LOW = 400.0;
@@ -75,7 +97,14 @@ type Audio = {
   band: BiquadFilterNode;
   carrier: GainNode;
   master: GainNode;
+  voice: GainNode;
+  cleanVoice: GainNode;
+  clips: (AudioBuffer | null)[];
+  playing: { index: number; src: AudioBufferSourceNode; gain: GainNode } | null;
 };
+
+/** Seconds of dead air before a locked transmission repeats. */
+const CLIP_GAP = 1.6;
 
 function startAudio(): Audio {
   const ctx = new AudioContext();
@@ -133,7 +162,87 @@ function startAudio(): Audio {
   });
   drone.connect(master);
 
-  return { ctx, noise, band, carrier, master };
+  // Voice: band-limited and lightly overdriven so it sounds like a radio, not a podcast.
+  const voice = ctx.createGain();
+  voice.gain.value = 0;
+  const hp = ctx.createBiquadFilter();
+  hp.type = "highpass";
+  hp.frequency.value = 320;
+  const lp = ctx.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.value = 3400;
+  const drive = ctx.createWaveShaper();
+  const curve = new Float32Array(1024);
+  for (let i = 0; i < curve.length; i++) {
+    const x = (i / (curve.length - 1)) * 2 - 1;
+    curve[i] = Math.tanh(2.2 * x) / Math.tanh(2.2);
+  }
+  drive.curve = curve;
+  voice.connect(hp).connect(lp).connect(drive).connect(master);
+  const cleanVoice = ctx.createGain();
+  cleanVoice.gain.value = 0;
+  cleanVoice.connect(master);
+
+  return {
+    ctx,
+    noise,
+    band,
+    carrier,
+    master,
+    voice,
+    cleanVoice,
+    clips: STATIONS.map(() => null),
+    playing: null,
+  };
+}
+
+/** Two falling notes, like a cabin announcement, so ARC reads as the ship talking. */
+const CHIME: [number, number][] = [
+  [0, 1046.5],
+  [0.32, 784],
+];
+const CHIME_LEN = 1.05;
+
+/**
+ * Pads a clip with silence so a looping source leaves a gap between repeats.
+ * With `chime`, the announcement chime is written in front of the line.
+ */
+async function loadClip(ctx: AudioContext, url: string, chime = false) {
+  const res = await fetch(url);
+  const clip = await ctx.decodeAudioData(await res.arrayBuffer());
+  const sr = clip.sampleRate;
+  const lead = chime ? Math.round(CHIME_LEN * sr) : 0;
+  const padded = ctx.createBuffer(
+    1,
+    lead + clip.length + Math.round(CLIP_GAP * sr),
+    sr,
+  );
+  if (chime) {
+    const out = padded.getChannelData(0);
+    for (const [at, f] of CHIME) {
+      const start = Math.round(at * sr);
+      for (let i = 0; i < 0.6 * sr; i++) {
+        const t = i / sr;
+        const env = Math.min(1, t / 0.005) * Math.exp(-t * 6);
+        out[start + i] +=
+          0.22 *
+          env *
+          (Math.sin(2 * Math.PI * f * t) +
+            0.3 * Math.sin(2 * Math.PI * f * 2 * t));
+      }
+    }
+  }
+  padded.copyToChannel(clip.getChannelData(0), 0, lead);
+  return padded;
+}
+
+function stopVoice(a: Audio) {
+  if (!a.playing) return;
+  const { src, gain } = a.playing;
+  const now = a.ctx.currentTime;
+  gain.gain.setTargetAtTime(0, now, 0.06);
+  src.stop(now + 0.4);
+  a.playing = null;
 }
 
 function blip(audio: Audio | null, high: boolean) {
@@ -161,6 +270,7 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
   const [found, setFound] = useState<boolean[]>(STATIONS.map(() => false));
   const [reveal, setReveal] = useState<number[]>(STATIONS.map(() => 0));
   const [scramble, setScramble] = useState(0);
+  const [clipsReady, setClipsReady] = useState(0);
 
   const { index, lock } = lockFor(tune);
 
@@ -257,15 +367,54 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
     if (!a) return;
     const now = a.ctx.currentTime;
     a.noise.gain.setTargetAtTime(0.24 * (1 - 0.85 * lock), now, 0.05);
-    a.carrier.gain.setTargetAtTime(0.07 * lock * lock, now, 0.05);
+    const hasVoice = index >= 0 && a.clips[index] !== null;
+    a.carrier.gain.setTargetAtTime(
+      (hasVoice ? 0.02 : 0.07) * lock * lock,
+      now,
+      0.05,
+    );
     a.band.frequency.setTargetAtTime(400 + tune * 3200, now, 0.05);
-  }, [tune, lock, sound]);
+    // Her voice fades up out of the static as the dial closes in.
+    const level = hasVoice ? 1.1 * lock * lock : 0;
+    a.voice.gain.setTargetAtTime(level, now, 0.08);
+    a.cleanVoice.gain.setTargetAtTime(0.8 * level, now, 0.08);
+  }, [tune, lock, sound, index, clipsReady]);
+
+  // Start a station's recording once the dial is close, stop it when you tune away.
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    const want = sound && index >= 0 && lock >= 0.5 ? index : -1;
+    if (a.playing && a.playing.index !== want) stopVoice(a);
+    const clip = want >= 0 ? a.clips[want] : null;
+    if (clip && !a.playing) {
+      const src = a.ctx.createBufferSource();
+      src.buffer = clip;
+      src.loop = true;
+      const gain = a.ctx.createGain();
+      src.connect(gain).connect(STATIONS[want].clean ? a.cleanVoice : a.voice);
+      src.start();
+      a.playing = { index: want, src, gain };
+    }
+  }, [index, lock, sound, clipsReady]);
 
   useEffect(() => () => void audioRef.current?.ctx.close(), []);
 
   const toggleSound = () => {
     if (!audioRef.current) {
-      audioRef.current = startAudio();
+      const a = startAudio();
+      audioRef.current = a;
+      STATIONS.forEach((s, i) => {
+        if (!s.clip) return;
+        loadClip(a.ctx, s.clip, s.who === "ARC")
+          .then((buf) => {
+            a.clips[i] = buf;
+            setClipsReady((n) => n + 1);
+          })
+          .catch(() => {
+            // Without the recording the station still decodes as text.
+          });
+      });
       setSound(true);
       return;
     }
