@@ -16,7 +16,7 @@ import {
 } from "@/content/last-signal-film";
 import { read, TRUSTED } from "@/lib/last-signal-intent";
 import { InsertScreen } from "./inserts";
-import { listen, speechSupported } from "./listen";
+import { listen, primeMic, speechSupported } from "./listen";
 import { FilmSound, type Mood } from "./sound";
 
 type Ending = "home" | "signal" | "static";
@@ -111,8 +111,11 @@ export function FilmPlayer() {
 
   useEffect(() => {
     // Read after mount: browser-only facts the server can't know.
+    const speech = speechSupported();
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCanSpeak(speechSupported());
+    setCanSpeak(speech);
+    // Ask for the mic now, not when Ines first stops to listen.
+    if (speech) void primeMic().then((ok) => ok || setCanSpeak(false));
     try {
       setFound(JSON.parse(localStorage.getItem(ENDINGS_KEY) ?? "[]"));
     } catch {}
@@ -243,8 +246,8 @@ export function FilmPlayer() {
       final === "static" || trust < TRUSTED ? "static" : (final as Ending);
     await reel(REELS[end]);
     if (signal.aborted) return;
-    sound.mood("silence", 6);
-    void sound.sfx(undefined);
+    // The film is over: let everything, static included, fade to nothing.
+    void sound.fadeOut(6);
     setEnding(end);
     setFound((f) => {
       const next = f.includes(end) ? f : [...f, end];

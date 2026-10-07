@@ -143,3 +143,40 @@ async function startMeter(onLevel: (l: number) => void) {
     },
   };
 }
+
+/**
+ * Asks for the mic up front, when the page opens, so the browser's permission
+ * prompt never lands in the middle of the film. Resolves false if they say no.
+ */
+export async function primeMic(): Promise<boolean> {
+  if (typeof navigator.mediaDevices?.getUserMedia !== "function") return false;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach((t) => t.stop());
+  } catch {
+    return false;
+  }
+  // Safari asks for speech recognition separately; ask that now too.
+  const w = window as unknown as Record<string, RecognitionCtor | undefined>;
+  const Ctor = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+  if (Ctor)
+    await new Promise<void>((done) => {
+      const rec = new Ctor();
+      const end = () => {
+        try {
+          rec.abort();
+        } catch {}
+        done();
+      };
+      rec.onresult = end;
+      rec.onerror = end;
+      rec.onend = () => done();
+      try {
+        rec.start();
+        setTimeout(end, 300);
+      } catch {
+        done();
+      }
+    });
+  return true;
+}

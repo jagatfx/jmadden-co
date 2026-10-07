@@ -238,7 +238,17 @@ export class FilmSound {
     void this.sfx(undefined);
   }
 
+  /** Fades the whole mix, static and score included, then shuts it down. */
+  async fadeOut(seconds: number) {
+    const now = this.ctx.currentTime;
+    this.master.gain.cancelScheduledValues(now);
+    this.master.gain.setTargetAtTime(0, now, seconds / 5);
+    await new Promise((r) => setTimeout(r, seconds * 1000));
+    this.close();
+  }
+
   close() {
+    if (this.ctx.state === "closed") return;
     this.hush();
     void this.ctx.close();
   }
