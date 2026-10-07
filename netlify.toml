@@ -1,7 +1,9 @@
 # Next.js 16 build; Netlify's Next.js runtime is applied automatically.
 [build]
   # Site media is in Git LFS: fetch it, then refuse to build if any is missing.
-  command = "git lfs install --local && git lfs pull && bun install && bun run check-media && bun run build"
+  # Netlify can narrow LFS fetches to images, which left the mp3s as pointers,
+  # so ask for every file explicitly.
+  command = "git lfs install --local && git lfs pull --include=\"*\" --exclude=\"\" && bun install && bun run check-media && bun run build"
   publish = ".next"
 
 [build.environment]

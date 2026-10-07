@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { FilmPlayer } from "@/components/film/player";
 import { Poster } from "@/components/poster";
 import { Receiver } from "@/components/receiver";
 import { SectionLabel } from "@/components/site-chrome";
@@ -43,8 +44,13 @@ const PROGRESS: { date: string; what: string; done: boolean }[] = [
     done: true,
   },
   {
+    date: "2026-10-07",
+    what: "First cut in stills: every shot, every voice, all three endings, and it listens",
+    done: true,
+  },
+  {
     date: "2026-10-12",
-    what: "All 48 shots generated and reviewed",
+    what: "The stills start moving: every shot as video",
     done: false,
   },
   {
@@ -78,6 +84,20 @@ export default async function WorkPage({ params }: PageProps<"/work/[slug]">) {
         </div>
         <Poster className="mx-auto block h-auto w-full max-w-xs rotate-2 shadow-[10px_10px_0_var(--cobalt)]" />
       </header>
+
+      <section className="mx-auto max-w-6xl px-4 pt-20 sm:px-8">
+        <SectionLabel>Take the call</SectionLabel>
+        <h2 className="mb-3 max-w-3xl font-display text-4xl leading-tight sm:text-5xl">
+          The first cut is playable. She can hear you.
+        </h2>
+        <p className="mb-10 max-w-2xl text-lg text-ink-soft">
+          Every shot, voice and ending is in, as stills with sound while the
+          video renders. Three times she&apos;ll stop and ask what to do. Say it
+          out loud, or type it. Answer like you mean it: how you talk to her
+          matters as much as what you pick.
+        </p>
+        <FilmPlayer />
+      </section>
 
       <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-8">
         <SectionLabel>Meet Ines</SectionLabel>
