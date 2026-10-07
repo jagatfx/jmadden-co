@@ -24,7 +24,9 @@ export async function generateMetadata({
   return { title: post.title, description: blurb };
 }
 
-export default async function ArchivePostPage({ params }: PageProps<"/archive/[slug]">) {
+export default async function ArchivePostPage({
+  params,
+}: PageProps<"/archive/[slug]">) {
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) notFound();
@@ -41,7 +43,9 @@ export default async function ArchivePostPage({ params }: PageProps<"/archive/[s
       >
         ← Earlier work
       </Link>
-      <SectionLabel className="mt-8 text-ink-soft">{formatDate(post.date)}</SectionLabel>
+      <SectionLabel className="mt-8 text-ink-soft">
+        {formatDate(post.date)}
+      </SectionLabel>
       <h1 className="font-display text-5xl leading-tight tracking-tight sm:text-6xl">
         {post.title}
       </h1>
@@ -56,21 +60,35 @@ export default async function ArchivePostPage({ params }: PageProps<"/archive/[s
         ))}
       </ul>
 
-      <div className="archive-prose mt-10" dangerouslySetInnerHTML={{ __html: post.html }} />
+      <div
+        className="archive-prose mt-10"
+        dangerouslySetInnerHTML={{ __html: post.html }}
+      />
 
-      <nav className="mt-20 grid gap-4 border-t-2 border-ink pt-8 sm:grid-cols-2" aria-label="More earlier work">
+      <nav
+        className="mt-20 grid gap-4 border-t-2 border-ink pt-8 sm:grid-cols-2"
+        aria-label="More earlier work"
+      >
         {older ? (
           <Link href={`/archive/${older.slug}`} className="group">
-            <span className="font-mono text-xs tracking-[0.15em] text-ink-soft uppercase">← Older</span>
-            <span className="mt-1 block font-display text-2xl group-hover:italic">{older.title}</span>
+            <span className="font-mono text-xs tracking-[0.15em] text-ink-soft uppercase">
+              ← Older
+            </span>
+            <span className="mt-1 block font-display text-2xl group-hover:italic">
+              {older.title}
+            </span>
           </Link>
         ) : (
           <span />
         )}
         {newer && (
           <Link href={`/archive/${newer.slug}`} className="group sm:text-right">
-            <span className="font-mono text-xs tracking-[0.15em] text-ink-soft uppercase">Newer →</span>
-            <span className="mt-1 block font-display text-2xl group-hover:italic">{newer.title}</span>
+            <span className="font-mono text-xs tracking-[0.15em] text-ink-soft uppercase">
+              Newer →
+            </span>
+            <span className="mt-1 block font-display text-2xl group-hover:italic">
+              {newer.title}
+            </span>
           </Link>
         )}
       </nav>

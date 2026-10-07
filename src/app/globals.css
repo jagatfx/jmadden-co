@@ -63,7 +63,9 @@ body::after {
 }
 
 .font-display {
-  font-variation-settings: "SOFT" 100, "WONK" 1;
+  font-variation-settings:
+    "SOFT" 100,
+    "WONK" 1;
 }
 
 /* Marquee for the lineage ticker. */

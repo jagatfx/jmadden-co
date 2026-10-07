@@ -17,7 +17,9 @@ export function SiteHeader() {
         >
           j
         </span>
-        <span className="font-display text-xl tracking-tight whitespace-nowrap">{site.name}</span>
+        <span className="font-display text-xl tracking-tight whitespace-nowrap">
+          {site.name}
+        </span>
       </Link>
       <nav aria-label="Main">
         <ul className="flex gap-3 text-sm whitespace-nowrap sm:gap-7">
@@ -41,23 +43,34 @@ export function SiteFooter() {
   return (
     <footer className="mt-32 bg-ink text-paper">
       <div className="mx-auto flex w-full max-w-6xl flex-col justify-between gap-6 px-4 py-12 text-sm sm:flex-row sm:px-8">
-        <p className="max-w-md text-paper/70">
-          No astronauts were harmed in the making of this website. One was
-          mildly inconvenienced.
-        </p>
         <ul className="flex gap-6">
           <li>
-            <a href={site.links.x} target="_blank" rel="noopener noreferrer" className="hover:text-sun">
+            <a
+              href={site.links.x}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-sun"
+            >
               X
             </a>
           </li>
           <li>
-            <a href={site.links.github} target="_blank" rel="noopener noreferrer" className="hover:text-sun">
+            <a
+              href={site.links.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-sun"
+            >
               GitHub
             </a>
           </li>
           <li>
-            <a href={site.links.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-sun">
+            <a
+              href={site.links.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-sun"
+            >
               LinkedIn
             </a>
           </li>
@@ -75,7 +88,9 @@ export function SectionLabel({
   className?: string;
 }) {
   return (
-    <p className={`mb-5 font-mono text-xs tracking-[0.2em] uppercase ${className}`}>
+    <p
+      className={`mb-5 font-mono text-xs tracking-[0.2em] uppercase ${className}`}
+    >
       {children}
     </p>
   );

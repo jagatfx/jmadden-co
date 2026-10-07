@@ -7,9 +7,21 @@ type Station = { f: number; who: "INES" | "ARC" | "TEO"; line: string };
 
 /** Five fragments of the film, hidden in the static. Positions are 0 to 1 across the band. */
 const STATIONS: Station[] = [
-  { f: 0.13, who: "INES", line: "Any station, this is Perihelion. Any station." },
-  { f: 0.31, who: "INES", line: "Somebody's there. I can hear the hiss change." },
-  { f: 0.52, who: "INES", line: "Crew's under. Three of them. I'm the one who drew the short straw." },
+  {
+    f: 0.13,
+    who: "INES",
+    line: "Any station, this is Perihelion. Any station.",
+  },
+  {
+    f: 0.31,
+    who: "INES",
+    line: "Somebody's there. I can hear the hiss change.",
+  },
+  {
+    f: 0.52,
+    who: "INES",
+    line: "Crew's under. Three of them. I'm the one who drew the short straw.",
+  },
   { f: 0.71, who: "ARC", line: "Debris risk was within tolerance." },
   { f: 0.9, who: "INES", line: "Talk to me. I'm not doing this one alone." },
 ];
@@ -164,7 +176,9 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     const row = ctx.createImageData(W, 1);
     let raf = 0;
     let frame = 0;
@@ -179,7 +193,10 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
           const d = (f - s.f) * W;
           const pulse = 0.55 + 0.45 * Math.sin(time / 260 + s.f * 40);
           v += Math.exp(-(d * d) / 2.2) * 0.75 * pulse;
-          v += Math.exp(-((d - 3) * (d - 3)) / 1.2) * 0.22 * (Math.random() > 0.5 ? 1 : 0);
+          v +=
+            Math.exp(-((d - 3) * (d - 3)) / 1.2) *
+            0.22 *
+            (Math.random() > 0.5 ? 1 : 0);
         }
         // The dial itself glows faintly so you can see where you are listening.
         const dt = (f - t) * W;
@@ -213,11 +230,15 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
       const total = STATIONS[index].line.length;
       const cur = revealRef.current[index];
       if (cur >= total) {
-        setFound((prev) => (prev[index] ? prev : prev.map((v, i) => i === index || v)));
+        setFound((prev) =>
+          prev[index] ? prev : prev.map((v, i) => i === index || v),
+        );
         window.clearInterval(id);
         return;
       }
-      revealRef.current = revealRef.current.map((v, i) => (i === index ? v + 1 : v));
+      revealRef.current = revealRef.current.map((v, i) =>
+        i === index ? v + 1 : v,
+      );
       setReveal(revealRef.current);
       blip(audioRef.current, cur % 3 === 0);
     }, 45);
@@ -268,8 +289,10 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
 
   const onKey = (e: React.KeyboardEvent) => {
     const step = e.shiftKey ? 0.02 : 0.004;
-    if (e.key === "ArrowRight" || e.key === "ArrowUp") setTuneClamped(tuneRef.current + step);
-    else if (e.key === "ArrowLeft" || e.key === "ArrowDown") setTuneClamped(tuneRef.current - step);
+    if (e.key === "ArrowRight" || e.key === "ArrowUp")
+      setTuneClamped(tuneRef.current + step);
+    else if (e.key === "ArrowLeft" || e.key === "ArrowDown")
+      setTuneClamped(tuneRef.current - step);
     else return;
     e.preventDefault();
   };
@@ -281,7 +304,9 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
 
   return (
     <div className="relative overflow-hidden rounded-[28px] bg-night text-paper shadow-[0_30px_80px_-30px_rgba(35,71,214,0.6)] ring-4 ring-ink">
-      <div className={`relative ${compact ? "aspect-[4/5] sm:aspect-[16/7]" : "aspect-[4/5] sm:aspect-[16/8]"}`}>
+      <div
+        className={`relative ${compact ? "aspect-[4/5] sm:aspect-[16/7]" : "aspect-[4/5] sm:aspect-[16/8]"}`}
+      >
         <canvas
           ref={canvasRef}
           width={W}
@@ -297,7 +322,8 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
             Atacama dish<span className="hidden sm:inline"> · rx live</span>
           </span>
           <span className="text-right">
-            {count}/{STATIONS.length}<span className="hidden sm:inline"> transmissions</span> found
+            {count}/{STATIONS.length}
+            <span className="hidden sm:inline"> transmissions</span> found
           </span>
         </div>
 
@@ -308,7 +334,9 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
               style={{ opacity: 0.35 + lock * 0.65 }}
               aria-live="polite"
             >
-              <span className={`mb-3 block font-mono text-xs tracking-[0.3em] ${station.who === "ARC" ? "text-pink" : "text-sun"}`}>
+              <span
+                className={`mb-3 block font-mono text-xs tracking-[0.3em] ${station.who === "ARC" ? "text-pink" : "text-sun"}`}
+              >
                 {station.who}
               </span>
               {station.line.split("").map((ch, i) =>
@@ -324,7 +352,10 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
           ) : count === STATIONS.length ? (
             <p className="mx-auto max-w-2xl font-display text-2xl leading-snug sm:text-4xl">
               You found all five.{" "}
-              <Link href="/work/last-signal" className="pointer-events-auto text-sun underline">
+              <Link
+                href="/work/last-signal"
+                className="pointer-events-auto text-sun underline"
+              >
                 Last Signal
               </Link>{" "}
               premieres October 16. She&apos;ll be waiting.
@@ -371,7 +402,10 @@ export function Receiver({ compact = false }: { compact?: boolean }) {
             <span
               key={i}
               className="absolute bottom-0 w-px bg-paper/40"
-              style={{ left: `${(i / 40) * 100}%`, height: i % 5 === 0 ? "45%" : "22%" }}
+              style={{
+                left: `${(i / 40) * 100}%`,
+                height: i % 5 === 0 ? "45%" : "22%",
+              }}
             />
           ))}
           {STATIONS.map((s, i) => (

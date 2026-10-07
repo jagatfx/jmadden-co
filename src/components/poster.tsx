@@ -17,17 +17,57 @@ export function Poster({ className = "" }: { className?: string }) {
       </defs>
       <g clipPath="url(#planet)">
         <rect x="100" y="200" width="400" height="400" fill="var(--sun)" />
-        <rect x="100" y="300" width="400" height="26" fill="var(--pink)" transform="rotate(-12 300 410)" />
-        <rect x="100" y="352" width="400" height="12" fill="var(--cobalt)" transform="rotate(-12 300 410)" />
-        <rect x="100" y="420" width="400" height="40" fill="var(--pink)" transform="rotate(-12 300 410)" />
-        <rect x="100" y="490" width="400" height="10" fill="var(--cobalt)" transform="rotate(-12 300 410)" />
+        <rect
+          x="100"
+          y="300"
+          width="400"
+          height="26"
+          fill="var(--pink)"
+          transform="rotate(-12 300 410)"
+        />
+        <rect
+          x="100"
+          y="352"
+          width="400"
+          height="12"
+          fill="var(--cobalt)"
+          transform="rotate(-12 300 410)"
+        />
+        <rect
+          x="100"
+          y="420"
+          width="400"
+          height="40"
+          fill="var(--pink)"
+          transform="rotate(-12 300 410)"
+        />
+        <rect
+          x="100"
+          y="490"
+          width="400"
+          height="10"
+          fill="var(--cobalt)"
+          transform="rotate(-12 300 410)"
+        />
       </g>
 
       {/* Radio waves from the dish, far away. */}
       <g fill="none" stroke="var(--paper)" strokeWidth="3">
         <circle cx="58" cy="120" r="26" className="ripple" />
-        <circle cx="58" cy="120" r="26" className="ripple" style={{ animationDelay: "1s" }} />
-        <circle cx="58" cy="120" r="26" className="ripple" style={{ animationDelay: "2s" }} />
+        <circle
+          cx="58"
+          cy="120"
+          r="26"
+          className="ripple"
+          style={{ animationDelay: "1s" }}
+        />
+        <circle
+          cx="58"
+          cy="120"
+          r="26"
+          className="ripple"
+          style={{ animationDelay: "2s" }}
+        />
       </g>
       <circle cx="58" cy="120" r="6" fill="var(--paper)" />
 
@@ -43,13 +83,51 @@ export function Poster({ className = "" }: { className?: string }) {
       {/* Astronaut. */}
       <g className="drift">
         <g transform="translate(196 262)">
-          <rect x="-15" y="2" width="30" height="34" rx="9" fill="var(--paper)" />
+          <rect
+            x="-15"
+            y="2"
+            width="30"
+            height="34"
+            rx="9"
+            fill="var(--paper)"
+          />
           <rect x="-21" y="6" width="9" height="24" rx="4" fill="var(--ink)" />
           <circle cx="0" cy="-8" r="15" fill="var(--paper)" />
-          <rect x="-9" y="-14" width="18" height="11" rx="5" fill="var(--cobalt)" />
-          <rect x="11" y="6" width="20" height="8" rx="4" fill="var(--paper)" transform="rotate(-35 11 10)" />
-          <rect x="-6" y="32" width="9" height="20" rx="4" fill="var(--paper)" transform="rotate(14 -2 34)" />
-          <rect x="5" y="32" width="9" height="18" rx="4" fill="var(--paper)" transform="rotate(-10 9 34)" />
+          <rect
+            x="-9"
+            y="-14"
+            width="18"
+            height="11"
+            rx="5"
+            fill="var(--cobalt)"
+          />
+          <rect
+            x="11"
+            y="6"
+            width="20"
+            height="8"
+            rx="4"
+            fill="var(--paper)"
+            transform="rotate(-35 11 10)"
+          />
+          <rect
+            x="-6"
+            y="32"
+            width="9"
+            height="20"
+            rx="4"
+            fill="var(--paper)"
+            transform="rotate(14 -2 34)"
+          />
+          <rect
+            x="5"
+            y="32"
+            width="9"
+            height="18"
+            rx="4"
+            fill="var(--paper)"
+            transform="rotate(-10 9 34)"
+          />
           <circle cx="0" cy="18" r="3" fill="var(--tomato)" className="blink" />
         </g>
       </g>

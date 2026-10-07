@@ -43,10 +43,10 @@ export default function Home() {
           </span>
         </h1>
         <p className="mt-8 max-w-2xl text-lg leading-relaxed sm:text-xl">
-          I&apos;m Jacob Madden. I&apos;ve written software for 25 years and spent
-          the last ten making things you step inside: AR portals, a VR stage
-          for amateur actors, a drum machine you play by nodding. Now I&apos;m
-          making a movie that listens to you.
+          I&apos;m Jacob Madden. I&apos;ve written software for 25 years and
+          spent the last ten making things you step inside: AR portals, a VR
+          stage for amateur actors, a drum machine you play by nodding. Now
+          I&apos;m making a movie that listens to you.
         </p>
 
         <div className="mt-12">
@@ -67,7 +67,9 @@ export default function Home() {
             <Poster className="block h-auto w-full" />
           </Link>
           <div>
-            <SectionLabel className="text-sun">In production · premieres Oct 16</SectionLabel>
+            <SectionLabel className="text-sun">
+              In production · premieres Oct 16
+            </SectionLabel>
             <h2 className="font-display text-6xl leading-none tracking-tight sm:text-7xl">
               Last Signal
             </h2>
@@ -97,11 +99,11 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-8">
         <SectionLabel>Family tree</SectionLabel>
         <h2 className="max-w-3xl font-display text-5xl leading-tight tracking-tight sm:text-6xl">
-          Every film is somebody&apos;s kid.
+          Every film is somebody&apos;s creation.
         </h2>
         <p className="mt-4 max-w-2xl text-lg text-ink-soft">
-          Last Signal&apos;s ancestors, on page, screen, and airwave, and what it
-          borrowed from each. Respectfully. Mostly.
+          Last Signal&apos;s ancestors, on page, screen, and airwave, and what
+          it borrowed from each.
         </p>
         <div className="mt-10">
           <Lineage />
@@ -134,7 +136,8 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-8">
         <SectionLabel>Before this, 2015 to 2020</SectionLabel>
         <h2 className="max-w-3xl font-display text-5xl leading-tight tracking-tight sm:text-6xl">
-          Ten years of putting people <span className="italic text-cobalt">inside</span> things.
+          Ten years of putting people{" "}
+          <span className="italic text-cobalt">inside</span> things.
         </h2>
         <p className="mt-4 mb-10 max-w-2xl text-lg text-ink-soft">
           Hackathons, startups, and a few installations, mostly AR and VR, back

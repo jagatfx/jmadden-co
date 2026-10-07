@@ -53,16 +53,26 @@ const posts: Post[] = readdirSync(dir)
       // Gatsby's `youtube:URL` shortcode.
       .replace(/`youtube:(\S+?)`/g, (_, url) => embed(url))
       // Raw iframes: drop fixed sizes, make responsive.
-      .replace(/<iframe[^>]*src="([^"]+)"[^>]*><\/iframe>/g, (_, url) => embed(url))
+      .replace(/<iframe[^>]*src="([^"]+)"[^>]*><\/iframe>/g, (_, url) =>
+        embed(url),
+      )
       // Relative images were converted to webp under public/archive.
-      .replace(/!\[([^\]]*)\]\(\.?\/?([\w-]+)\.(png|jpe?g|gif)\)/g, (_, alt, name) => `![${alt}](/archive/${date}-${name}.webp)`);
+      .replace(
+        /!\[([^\]]*)\]\(\.?\/?([\w-]+)\.(png|jpe?g|gif)\)/g,
+        (_, alt, name) => `![${alt}](/archive/${date}-${name}.webp)`,
+      );
 
     let html = marked.parse(md, { async: false }) as string;
     // Every outbound link opens in a new tab.
-    html = html.replace(/<a ([^>]*?)href="(https?:\/\/[^"]+)"([^>]*)>/g, (_, pre, href, post) => {
-      const rest = `${pre} ${post}`.replace(/\s*(target|rel)="[^"]*"/g, "").trim();
-      return `<a href="${href}"${rest ? ` ${rest}` : ""} target="_blank" rel="noopener noreferrer">`;
-    });
+    html = html.replace(
+      /<a ([^>]*?)href="(https?:\/\/[^"]+)"([^>]*)>/g,
+      (_, pre, href, post) => {
+        const rest = `${pre} ${post}`
+          .replace(/\s*(target|rel)="[^"]*"/g, "")
+          .trim();
+        return `<a href="${href}"${rest ? ` ${rest}` : ""} target="_blank" rel="noopener noreferrer">`;
+      },
+    );
     html = html.replace(/<img /g, '<img loading="lazy" ');
 
     return {

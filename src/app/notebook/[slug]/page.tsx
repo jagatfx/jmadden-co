@@ -17,7 +17,9 @@ export async function generateMetadata({
   return { title: note.title, description: note.summary };
 }
 
-export default async function NotePage({ params }: PageProps<"/notebook/[slug]">) {
+export default async function NotePage({
+  params,
+}: PageProps<"/notebook/[slug]">) {
   const { slug } = await params;
   const note = getNote(slug);
   if (!note) notFound();
@@ -39,7 +41,12 @@ export default async function NotePage({ params }: PageProps<"/notebook/[slug]">
         ))}
       </div>
       {note.xUrl && (
-        <a href={note.xUrl} target="_blank" rel="noopener noreferrer" className="mt-10 inline-block font-medium text-cobalt underline">
+        <a
+          href={note.xUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-10 inline-block font-medium text-cobalt underline"
+        >
           Discuss on X
         </a>
       )}

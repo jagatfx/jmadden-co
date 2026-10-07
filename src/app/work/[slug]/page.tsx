@@ -21,12 +21,32 @@ export async function generateMetadata({
 }
 
 const PROGRESS: { date: string; what: string; done: boolean }[] = [
-  { date: "2026-10-07", what: "Story locked: one astronaut, one ship's computer, one stranger on the radio", done: true },
-  { date: "2026-10-07", what: "Script, 48-shot list, and the character brief Ines runs on", done: true },
-  { date: "2026-10-07", what: "Radio teaser, playable on the homepage", done: true },
+  {
+    date: "2026-10-07",
+    what: "Story locked: one astronaut, one ship's computer, one stranger on the radio",
+    done: true,
+  },
+  {
+    date: "2026-10-07",
+    what: "Script, 48-shot list, and the character brief Ines runs on",
+    done: true,
+  },
+  {
+    date: "2026-10-07",
+    what: "Radio teaser, playable on the homepage",
+    done: true,
+  },
   { date: "2026-10-09", what: "Look frames and Ines's voice", done: false },
-  { date: "2026-10-12", what: "All 48 shots generated and reviewed", done: false },
-  { date: "2026-10-14", what: "Live conversation wired into the player", done: false },
+  {
+    date: "2026-10-12",
+    what: "All 48 shots generated and reviewed",
+    done: false,
+  },
+  {
+    date: "2026-10-14",
+    what: "Live conversation wired into the player",
+    done: false,
+  },
   { date: "2026-10-16", what: "Premiere", done: false },
 ];
 
@@ -40,12 +60,16 @@ export default async function WorkPage({ params }: PageProps<"/work/[slug]">) {
       <header className="mx-auto grid max-w-6xl items-end gap-10 px-4 pt-8 sm:px-8 lg:grid-cols-[7fr_4fr]">
         <div>
           <SectionLabel>
-            {project.shipped ? "Out now" : `In production · premieres ${formatDate(project.date)}`}
+            {project.shipped
+              ? "Out now"
+              : `In production · premieres ${formatDate(project.date)}`}
           </SectionLabel>
           <h1 className="font-display text-7xl leading-none tracking-tight sm:text-9xl">
             {project.title}
           </h1>
-          <p className="mt-8 max-w-2xl text-xl leading-relaxed">{project.hook}</p>
+          <p className="mt-8 max-w-2xl text-xl leading-relaxed">
+            {project.hook}
+          </p>
         </div>
         <Poster className="mx-auto block h-auto w-full max-w-xs rotate-2 shadow-[10px_10px_0_var(--cobalt)]" />
       </header>
@@ -68,10 +92,11 @@ export default async function WorkPage({ params }: PageProps<"/work/[slug]">) {
         <div>
           <SectionLabel>From the script</SectionLabel>
           <div className="-rotate-1 rounded-sm bg-white p-8 font-mono text-[13px] leading-relaxed text-ink shadow-[8px_8px_0_var(--tomato)] sm:p-10">
-            <p className="font-medium">10. INT. PERIHELION HAB, SEC-01. HOLD.</p>
+            <p className="font-medium">
+              10. INT. PERIHELION HAB, SEC-01. HOLD.
+            </p>
             <p className="mt-4">
-              Emergency light. Close on INES. She looks past the camera, at
-              you.
+              Emergency light. Close on INES. She looks past the camera, at you.
             </p>
             <p className="mt-6 text-center">INES</p>
             <p className="mx-auto max-w-[28ch]">
@@ -119,9 +144,16 @@ export default async function WorkPage({ params }: PageProps<"/work/[slug]">) {
         <SectionLabel>Production log</SectionLabel>
         <ol className="divide-y-2 divide-ink border-y-2 border-ink">
           {PROGRESS.map((p) => (
-            <li key={p.what} className="grid grid-cols-[6rem_1fr_auto] items-center gap-4 py-4">
-              <span className="font-mono text-sm">{formatDate(p.date, false)}</span>
-              <span className={`text-lg ${p.done ? "" : "text-ink-soft"}`}>{p.what}</span>
+            <li
+              key={p.what}
+              className="grid grid-cols-[6rem_1fr_auto] items-center gap-4 py-4"
+            >
+              <span className="font-mono text-sm">
+                {formatDate(p.date, false)}
+              </span>
+              <span className={`text-lg ${p.done ? "" : "text-ink-soft"}`}>
+                {p.what}
+              </span>
               <span
                 className={`rounded-full px-3 py-1 font-mono text-[11px] tracking-wider uppercase ${p.done ? "bg-teal text-paper" : "border-2 border-ink"}`}
               >

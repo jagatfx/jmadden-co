@@ -6,7 +6,8 @@ import { formatDate } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Notebook",
-  description: "A dated build log: what I made, what broke, and what I learned.",
+  description:
+    "A dated build log: what I made, what broke, and what I learned.",
 };
 
 export default function NotebookPage() {

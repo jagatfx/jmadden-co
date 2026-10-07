@@ -9,18 +9,86 @@ type Node = {
 };
 
 const N: Record<string, Node> = {
-  open: { x: 70, y: 150, label: "The signal", sub: "shots 1–9", fill: "var(--paper)" },
-  q1: { x: 210, y: 150, label: "Seal it, or", sub: "go outside?", fill: "var(--tomato)", ink: "var(--paper)", hold: true },
-  a: { x: 340, y: 80, label: "Seal", sub: "lose the garden", fill: "var(--teal)", ink: "var(--paper)" },
-  b: { x: 340, y: 220, label: "Outside", sub: "patch the hull", fill: "var(--cobalt)", ink: "var(--paper)" },
-  arc: { x: 470, y: 150, label: "ARC's secret", sub: "shots 14–21", fill: "var(--paper)" },
-  q2: { x: 600, y: 150, label: "Hear ARC,", sub: "or unplug it?", fill: "var(--tomato)", ink: "var(--paper)", hold: true },
-  c: { x: 730, y: 80, label: "ARC helps", fill: "var(--plum)", ink: "var(--paper)" },
-  d: { x: 730, y: 220, label: "Just us now", fill: "var(--plum)", ink: "var(--paper)" },
-  q3: { x: 860, y: 150, label: "Talk to me", sub: "burn or send", fill: "var(--tomato)", ink: "var(--paper)", hold: true },
+  open: {
+    x: 70,
+    y: 150,
+    label: "The signal",
+    sub: "shots 1–9",
+    fill: "var(--paper)",
+  },
+  q1: {
+    x: 210,
+    y: 150,
+    label: "Seal it, or",
+    sub: "go outside?",
+    fill: "var(--tomato)",
+    ink: "var(--paper)",
+    hold: true,
+  },
+  a: {
+    x: 340,
+    y: 80,
+    label: "Seal",
+    sub: "lose the garden",
+    fill: "var(--teal)",
+    ink: "var(--paper)",
+  },
+  b: {
+    x: 340,
+    y: 220,
+    label: "Outside",
+    sub: "patch the hull",
+    fill: "var(--cobalt)",
+    ink: "var(--paper)",
+  },
+  arc: {
+    x: 470,
+    y: 150,
+    label: "ARC's secret",
+    sub: "shots 14–21",
+    fill: "var(--paper)",
+  },
+  q2: {
+    x: 600,
+    y: 150,
+    label: "Hear ARC,",
+    sub: "or unplug it?",
+    fill: "var(--tomato)",
+    ink: "var(--paper)",
+    hold: true,
+  },
+  c: {
+    x: 730,
+    y: 80,
+    label: "ARC helps",
+    fill: "var(--plum)",
+    ink: "var(--paper)",
+  },
+  d: {
+    x: 730,
+    y: 220,
+    label: "Just us now",
+    fill: "var(--plum)",
+    ink: "var(--paper)",
+  },
+  q3: {
+    x: 860,
+    y: 150,
+    label: "Talk to me",
+    sub: "burn or send",
+    fill: "var(--tomato)",
+    ink: "var(--paper)",
+    hold: true,
+  },
   h: { x: 1000, y: 60, label: "Homecoming", fill: "var(--sun)" },
   s: { x: 1000, y: 150, label: "The Signal", fill: "var(--pink)" },
-  t: { x: 1000, y: 240, label: "Static", fill: "var(--ink)", ink: "var(--paper)" },
+  t: {
+    x: 1000,
+    y: 240,
+    label: "Static",
+    fill: "var(--ink)",
+    ink: "var(--paper)",
+  },
 };
 
 const EDGES: [string, string][] = [
@@ -66,9 +134,23 @@ export function StoryMap() {
         {Object.entries(N).map(([key, n]) => (
           <g key={key} transform={`translate(${n.x} ${n.y})`}>
             {n.hold ? (
-              <circle r="46" fill={n.fill} stroke="var(--ink)" strokeWidth="3" />
+              <circle
+                r="46"
+                fill={n.fill}
+                stroke="var(--ink)"
+                strokeWidth="3"
+              />
             ) : (
-              <rect x="-56" y="-26" width="112" height="52" rx="26" fill={n.fill} stroke="var(--ink)" strokeWidth="3" />
+              <rect
+                x="-56"
+                y="-26"
+                width="112"
+                height="52"
+                rx="26"
+                fill={n.fill}
+                stroke="var(--ink)"
+                strokeWidth="3"
+              />
             )}
             <text
               textAnchor="middle"
@@ -94,10 +176,21 @@ export function StoryMap() {
             )}
           </g>
         ))}
-        <g className="font-mono" fontSize="10" fill="var(--ink-soft)" letterSpacing="2">
-          <text x="210" y="290" textAnchor="middle">YOU DECIDE</text>
-          <text x="600" y="290" textAnchor="middle">YOU DECIDE</text>
-          <text x="860" y="290" textAnchor="middle">YOU DECIDE</text>
+        <g
+          className="font-mono"
+          fontSize="10"
+          fill="var(--ink-soft)"
+          letterSpacing="2"
+        >
+          <text x="210" y="290" textAnchor="middle">
+            YOU DECIDE
+          </text>
+          <text x="600" y="290" textAnchor="middle">
+            YOU DECIDE
+          </text>
+          <text x="860" y="290" textAnchor="middle">
+            YOU DECIDE
+          </text>
         </g>
       </svg>
     </div>

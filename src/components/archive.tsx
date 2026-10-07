@@ -2,7 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { legacy } from "@/content/legacy";
 
-const FRAME = ["bg-tomato", "bg-cobalt", "bg-sun", "bg-teal", "bg-pink", "bg-plum"];
+const FRAME = [
+  "bg-tomato",
+  "bg-cobalt",
+  "bg-sun",
+  "bg-teal",
+  "bg-pink",
+  "bg-plum",
+];
 
 export function Archive() {
   return (
@@ -32,9 +39,13 @@ export function Archive() {
               <span className="font-display text-lg leading-tight group-hover:italic">
                 {item.title}
               </span>
-              <span className="font-mono text-xs text-ink-soft">{item.date.slice(0, 4)}</span>
+              <span className="font-mono text-xs text-ink-soft">
+                {item.date.slice(0, 4)}
+              </span>
             </div>
-            <p className="mt-1 text-sm leading-snug text-ink-soft">{item.blurb}</p>
+            <p className="mt-1 text-sm leading-snug text-ink-soft">
+              {item.blurb}
+            </p>
           </Link>
         </li>
       ))}

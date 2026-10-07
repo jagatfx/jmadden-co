@@ -17,12 +17,12 @@ bun run lint
 
 All content is typed data in `src/content/`, so adding work never touches page code:
 
-| File | What it holds |
-| --- | --- |
-| `projects.ts` | Case studies: hook, ship date, tools, how it works |
-| `lineage.ts` | Last Signal's family tree of films, books, and broadcasts |
-| `notes.ts` | Lab notebook entries, newest first |
-| `legacy.ts` | Earlier work (2015 to 2020): card titles, blurbs, and cover images in `public/archive/` |
+| File           | What it holds                                                                                                  |
+| -------------- | -------------------------------------------------------------------------------------------------------------- |
+| `projects.ts`  | Case studies: hook, ship date, tools, how it works                                                             |
+| `lineage.ts`   | Last Signal's family tree of films, books, and broadcasts                                                      |
+| `notes.ts`     | Lab notebook entries, newest first                                                                             |
+| `legacy.ts`    | Earlier work (2015 to 2020): card titles, blurbs, and cover images in `public/archive/`                        |
 | `archive/*.md` | The original write-ups from the old site. Run `bun run archive` after editing to regenerate `archive-posts.ts` |
 
 Nothing goes on the site as a placeholder. A piece appears once there is something real to show, even if it is a work in progress.
