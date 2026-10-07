@@ -9,7 +9,6 @@ export const legacy: LegacyItem[] = [
     blurb:
       "A VR nature program where you live as another species for a while. Oculus Launchpad.",
     image: "/archive/2020-02-01-bth2.webp",
-    href: "https://vimeo.com/388755507",
   },
   {
     date: "2019-11-21",
