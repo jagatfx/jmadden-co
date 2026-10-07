@@ -27,6 +27,8 @@ All content is typed data in `src/content/`, so adding work never touches page c
 
 Nothing goes on the site as a placeholder. A piece appears once there is something real to show, even if it is a work in progress.
 
+Last Signal itself is data too: `src/content/last-signal-film.ts` holds every shot, line, hold and ending. The player (`src/components/film/`) runs it, and `bun scripts/last-signal.ts` turns it into media: a still per shot (fal), a voice take per line and a sound per cue (ElevenLabs). It only makes what's missing, so delete a file to regenerate it. It needs `FAL_KEY` and `ELEVENLABS_API_KEY`.
+
 The homepage radio (`src/components/receiver.tsx`) is a canvas waterfall plus Web Audio synthesis; the five lines it hides are in its `STATIONS` list.
 
 Old post URLs (like `/unever-odd-ar`) redirect to `/archive/<slug>`. The `Check links` GitHub Action checks every outbound link in `src/content` on each PR.
