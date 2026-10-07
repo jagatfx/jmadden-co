@@ -1,0 +1,157 @@
+import type { LegacyItem } from "./types";
+
+/** Earlier AR, VR, and voice work, 2015 to 2020. Full write-ups live in archive-posts.ts. */
+export const legacy: LegacyItem[] = [
+  {
+    date: "2020-02-01",
+    slug: "beyond-the-human-vr",
+    title: "Beyond the Human",
+    blurb:
+      "A VR nature program where you live as another species for a while. Oculus Launchpad.",
+    image: "/archive/2020-02-01-bth2.webp",
+    href: "https://vimeo.com/388755507",
+  },
+  {
+    date: "2019-11-21",
+    slug: "uneven-odd-ar",
+    title: "Uneven and Odd",
+    blurb:
+      "Three dancers tracked live by a Kinect, dancing with projected scans of themselves.",
+    image: "/archive/2019-11-21-uneven-odd.webp",
+    href: "https://www.youtube.com/watch?v=ORECGKuRbXQ",
+  },
+  {
+    date: "2019-03-13",
+    slug: "music-discovery-ar",
+    title: "Music Discovery AR",
+    blurb:
+      "Walk through a portal; songs start playing as you get close to them. SXSW hackathon.",
+    image: "/archive/2019-03-13-music-discovery.webp",
+    href: "https://www.youtube.com/watch?v=-rCO2bzuyDk",
+  },
+  {
+    date: "2019-02-19",
+    slug: "autism-sidekick",
+    title: "Autism Sidekick",
+    blurb:
+      "An open-source AR companion that translates overwhelming sensory input. Unity for Humanity.",
+    image: "/archive/2019-02-19-autism-sidekick.webp",
+    href: "https://www.youtube.com/watch?v=bH6RDs4iTjQ",
+  },
+  {
+    date: "2019-02-14",
+    slug: "beatshade-bose-ar",
+    title: "Beatshade",
+    blurb: "A drum machine you play by nodding. Bose AR pitch competition.",
+    image: "/archive/2019-02-14-beatshade.webp",
+    href: "https://www.youtube.com/watch?v=Oi85i2Zpzf8",
+  },
+  {
+    date: "2018-11-11",
+    slug: "mixed-reality-pet",
+    title: "Mixed Reality Pet",
+    blurb: "A Magic Leap pet that lives on your actual furniture.",
+    image: "/archive/2018-11-11-mixed-reality-pet.webp",
+    href: "https://www.youtube.com/watch?v=JgAJ3n6ylA8",
+  },
+  {
+    date: "2018-10-29",
+    slug: "saganplanetwalk-ar",
+    title: "Sagan Planet Walk AR",
+    blurb:
+      "AR for Ithaca's scale model of the solar system, with Bill Nye along for the walk.",
+    image: "/archive/2018-10-29-saganplanetwalk-ar.webp",
+  },
+  {
+    date: "2018-10-28",
+    slug: "gorgekeep-portal",
+    title: "GorgeKeep Portal",
+    blurb:
+      "An AR portal 300 people walked through during Ithaca's Wizarding Weekend.",
+    image: "/archive/2018-10-28-gorgekeep-portal.webp",
+  },
+  {
+    date: "2018-09-13",
+    slug: "ml-turi-create",
+    title: "Style transfer notebooks",
+    blurb:
+      "Open-source Colab notebooks for Turi Create, so anyone could restyle a photo in an afternoon.",
+    image: "/archive/2018-09-13-ml-turi-create.webp",
+    href: "https://github.com/jagatfx/turicreate-colab",
+  },
+  {
+    date: "2018-05-04",
+    slug: "ar-painting",
+    title: "AR Painting",
+    blurb:
+      "A painting in a Hong Kong restaurant that greets you when you point a phone at it.",
+    image: "/archive/2018-05-04-ar-painting.webp",
+    href: "https://www.youtube.com/watch?v=KEyXqLvVwcQ",
+  },
+  {
+    date: "2018-05-02",
+    slug: "magnet-viewar",
+    title: "Magnet ViewAR",
+    blurb:
+      "Polaroids that unfold into AR photo spreads. ARKit, Vision, Core ML.",
+    image: "/archive/2018-05-02-viewar-title.webp",
+  },
+  {
+    date: "2017-10-06",
+    slug: "drama-club-vr",
+    title: "Drama Club",
+    blurb:
+      "Guitar Hero for actors: perform a famous scene in VR. MIT Reality Virtually.",
+    image: "/archive/2017-10-06-drama-club-vr.webp",
+    href: "https://devpost.com/software/drama-club",
+  },
+  {
+    date: "2017-10-05",
+    slug: "ar-introduce",
+    title: "AR Introduce",
+    blurb:
+      "Hackathon judges arranged around you in a circle, swipe to meet them.",
+    image: "/archive/2017-10-05-ar-introduce.webp",
+    href: "https://www.youtube.com/watch?v=TS4MfGW4TH0",
+  },
+  {
+    date: "2017-09-11",
+    slug: "techvalley-meetup",
+    title: "Speech synthesis talk",
+    blurb:
+      "A meetup talk on neural voices, back when WaveNet was the new thing.",
+    image: "/archive/2017-09-11-meetup-speech-synthesis.webp",
+  },
+  {
+    date: "2016-05-08",
+    slug: "sensay-alexa",
+    title: "SenSay",
+    blurb:
+      "A live tone dashboard for support calls, built overnight and pitched on zero sleep at TechCrunch Disrupt.",
+    image: "/archive/2016-05-08-sensay-dashboard.webp",
+  },
+  {
+    date: "2016-04-17",
+    slug: "tvgs-hackathon",
+    title: "VR gaming hackathon",
+    blurb:
+      "A weekend of Oculus Rift and HTC Vive experiments in Troy, New York.",
+    image: "/archive/2016-04-17-ralphvr.webp",
+  },
+  {
+    date: "2016-03-30",
+    slug: "tvgs-delhi-rickshaw",
+    title: "Delhi Rickshaw",
+    blurb:
+      "Grand Theft Auto's camera, Lemonade Stand's economics, Delhi's traffic.",
+    image: "/archive/2016-03-30-delhi-rickshaw2.webp",
+  },
+  {
+    date: "2015-11-22",
+    slug: "suw-2015",
+    title: "Design My Day",
+    blurb:
+      "Startup Weekend Bali pitch: an app of small ideas for how you feel today.",
+    image: "/archive/2015-11-22-dmd-suwbali.webp",
+  },
+];

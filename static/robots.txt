@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: */tags/
-
-sitemap: https://jmadden.netlify.com/sitemap.xml
