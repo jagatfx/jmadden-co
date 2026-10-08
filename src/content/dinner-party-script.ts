@@ -767,7 +767,9 @@ function fnv(s: string) {
 }
 
 export const lineUrl = (id: LineId) =>
-  `/api/dinner-party/voice?line=${id}&v=${fnv(lineVoice(id).text)}`;
+  `/api/dinner-party/voice/line/${id}/${fnv(lineVoice(id).text)}`;
 
 export const nameUrl = (name: string, who: Speaker, tone: NameTone) =>
-  `/api/dinner-party/voice?name=${encodeURIComponent(name)}&who=${who}&tone=${tone}&v=1`;
+  `/api/dinner-party/voice/name/${who}/${tone}/${encodeURIComponent(name)}/1`;
+
+export const sfxUrl = (id: string) => `/api/dinner-party/voice/sfx/${id}/1`;

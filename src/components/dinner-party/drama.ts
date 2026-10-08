@@ -163,7 +163,7 @@ export class Drama {
       return;
     this.moves.push(m);
     // Saying or doing something stops whoever's talking, Façade-style.
-    if (this.speaking && m.kind !== "near" && m.kind !== "away")
+    if (this.speaking && m.kind !== "near" && m.kind !== "away" && m.kind !== "space")
       this.speaking.abort();
     this.wake?.();
   }

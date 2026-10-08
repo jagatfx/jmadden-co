@@ -153,30 +153,34 @@ async function effect(text: string, seconds: number): Promise<Take> {
 // Two plays asking for the same new line at once share one recording.
 const inflight = new Map<string, Promise<Take>>();
 
-export async function GET(request: Request) {
-  const q = new URL(request.url).searchParams;
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ take: string[] }> },
+) {
+  // Everything that picks the take is in the path, never the query: a CDN
+  // that ignores query strings would otherwise hand every line the same take.
+  const [kind, ...rest] = (await params).take.map(decodeURIComponent);
   let voice: string;
   let text: string;
   let make = () => record(voice, text);
-  const line = q.get("line");
-  const sfx = q.get("sfx");
-  const name = q.get("name");
-  if (line) {
-    if (!(line in SCRIPT)) return new Response("No such line", { status: 404 });
+  if (kind === "line") {
+    const [line] = rest;
+    if (!line || !(line in SCRIPT))
+      return new Response("No such line", { status: 404 });
     ({ voice, text } = lineVoice(line as LineId));
-  } else if (name) {
-    const who = q.get("who");
-    const tone = q.get("tone");
+  } else if (kind === "name") {
+    const [who, tone, name] = rest;
     if (
       (who !== "TRIP" && who !== "GRACE") ||
-      (tone !== "exclaim" && tone !== "address")
+      (tone !== "exclaim" && tone !== "address") ||
+      !name
     )
       return new Response("Bad request", { status: 400 });
     const v = nameVoice(name, who, tone as NameTone);
     if (!v) return new Response("Not a name we'll say", { status: 422 });
     ({ voice, text } = v);
-  } else if (sfx && sfx in SFX) {
-    const [prompt, seconds] = SFX[sfx];
+  } else if (kind === "sfx" && rest[0] && rest[0] in SFX) {
+    const [prompt, seconds] = SFX[rest[0]];
     voice = "sfx";
     text = `${prompt}|${seconds}`;
     make = () => effect(prompt, seconds);
@@ -205,6 +209,9 @@ export async function GET(request: Request) {
   }
   // The URL carries a hash of the text, so a take never changes under it.
   return Response.json(take, {
-    headers: { "cache-control": "public, max-age=31536000, immutable" },
+    headers: {
+      "cache-control": "public, max-age=31536000, immutable",
+      "netlify-vary": "query",
+    },
   });
 }

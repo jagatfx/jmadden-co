@@ -13,6 +13,7 @@ import {
   SCRIPT,
   lineUrl,
   nameUrl,
+  sfxUrl,
   type LineId,
   type ScriptLine,
 } from "@/content/dinner-party-script";
@@ -544,7 +545,7 @@ export class Stage implements Cast {
     const key = `sfx:${id}`;
     let p = this.takes.get(key);
     if (!p) {
-      p = this.decode(`/api/dinner-party/voice?sfx=${id}&v=1`);
+      p = this.decode(sfxUrl(id));
       this.takes.set(key, p);
     }
     return p;
