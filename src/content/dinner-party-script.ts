@@ -1,11 +1,11 @@
 /**
- * Every line Trip and Grace can say. `text` is the subtitle, `read` is the
+ * Every line Theo and Nina can say. `text` is the subtitle, `read` is the
  * take as sent to the voice (with ElevenLabs direction tags), and `name` means
  * the guest's name is spoken just before the line, from the names catalog.
  * `scripts/dinner-party-lines.ts` records whatever is missing.
  */
 
-export type Speaker = "TRIP" | "GRACE";
+export type Speaker = "THEO" | "NINA";
 export type NameTone = "exclaim" | "address";
 export type ScriptLine = {
   who: Speaker;
@@ -17,13 +17,13 @@ export type ScriptLine = {
 };
 
 const T = (text: string, read?: string, name?: NameTone): ScriptLine => ({
-  who: "TRIP",
+  who: "THEO",
   text,
   read,
   name,
 });
 const G = (text: string, read?: string, name?: NameTone): ScriptLine => ({
-  who: "GRACE",
+  who: "NINA",
   text,
   read,
   name,
@@ -40,8 +40,8 @@ export const SCRIPT = {
   ),
   "d-t1": door(
     T(
-      "I'll deal with Dan. Tonight is not the night, Grace.",
-      "[irritated, hushed] I'll deal with Dan. Tonight is not the night, Grace.",
+      "I'll deal with Dan. Tonight is not the night, Nina.",
+      "[irritated, hushed] I'll deal with Dan. Tonight is not the night, Nina.",
     ),
   ),
   "d-g2": door(G("It's never the night.", "[bitter] It's never the night.")),
@@ -80,8 +80,8 @@ export const SCRIPT = {
 
   // 2. Drinks
   "k-g1": G(
-    "Trip's been mixing drinks since six.",
-    "[dry] Trip's been mixing drinks since six.",
+    "Theo's been mixing drinks since six.",
+    "[dry] Theo's been mixing drinks since six.",
   ),
   "k-t1": T(
     "Five-thirty. Practice makes perfect. So. What can I get you?",
@@ -101,13 +101,13 @@ export const SCRIPT = {
     "I'll surprise you. I make a mean martini.",
     "[confident] I'll surprise you. I make a mean martini.",
   ),
-  "k-t2": T("Grace? The usual?", "[bright] Grace? The usual?"),
+  "k-t2": T("Nina? The usual?", "[bright] Nina? The usual?"),
   "k-g2": G("Just wine.", "[short] Just wine."),
   "k-t3": T(
     "Just wine. She says it like it's a moral position.",
     "[needling, to the guest] Just wine. She says it like it's a moral position.",
   ),
-  "k-g3": G("It's a drink, Trip.", "[cool] It's a drink, Trip."),
+  "k-g3": G("It's a drink, Theo.", "[cool] It's a drink, Theo."),
 
   // 3. The painting
   "p-t1": T(
@@ -116,8 +116,8 @@ export const SCRIPT = {
     "address",
   ),
   "p-t2": T(
-    "Grace's little comeback.",
-    "[proud, slightly patronising] Grace's little comeback.",
+    "Nina's little comeback.",
+    "[proud, slightly patronising] Nina's little comeback.",
   ),
   "p-g1": G(
     "It's not a comeback. It's a painting.",
@@ -174,7 +174,7 @@ export const SCRIPT = {
     "[pointed, calm] Ask him what he promised in Venice.",
     "address",
   ),
-  "v-t3": T("Grace.", "[warning] Grace."),
+  "v-t3": T("Nina.", "[warning] Nina."),
   "v-g2": G("Go on. Tell them.", "[insisting] Go on. Tell them."),
   "v-t4": T(
     "I said we'd go back every five years.",
@@ -195,30 +195,30 @@ export const SCRIPT = {
     "address",
   ),
   "v-g5": G(
-    "It's not about the gondola, Trip.",
-    "[tired] It's not about the gondola, Trip.",
+    "It's not about the gondola, Theo.",
+    "[tired] It's not about the gondola, Theo.",
   ),
   "v-g6": G(
     "You knew us before all this. Who's being unfair here?",
     "[direct, to the guest] You knew us before all this. Who's being unfair here?",
   ),
-  "v-grace-t": T(
+  "v-nina-t": T(
     "Wow. Okay. Two against one. Great.",
     "[stung] Wow. Okay. Two against one. Great.",
   ),
-  "v-grace-g": G("Thank you.", "[quiet, grateful] Thank you."),
-  "v-trip-g": G(
-    "Of course. Everyone loves Trip.",
-    "[bitter] Of course. Everyone loves Trip.",
+  "v-nina-g": G("Thank you.", "[quiet, grateful] Thank you."),
+  "v-theo-g": G(
+    "Of course. Everyone loves Theo.",
+    "[bitter] Of course. Everyone loves Theo.",
   ),
-  "v-trip-t": T("That's not fair.", "[uncomfortable] That's not fair."),
+  "v-theo-t": T("That's not fair.", "[uncomfortable] That's not fair."),
   "v-both-g": G("Diplomatic again.", "[sigh] Diplomatic again."),
   "v-both-t": T(
     "No, that's... that's actually fair.",
     "[surprised, softer] No, that's... that's actually fair.",
   ),
 
-  // 5a. Trip's secret (his phone)
+  // 5a. Theo's secret (his phone)
   "s-t-g1": G(
     "Who's texting you at nine at night?",
     "[suspicious] Who's texting you at nine at night?",
@@ -245,11 +245,11 @@ export const SCRIPT = {
     "[ashamed] I was going to fix it before you ever had to know.",
   ),
   "s-t-cover-g": G(
-    "Fine. Keep your secrets, Trip. You're good at it.",
-    "[cold] Fine. Keep your secrets, Trip. You're good at it.",
+    "Fine. Keep your secrets, Theo. You're good at it.",
+    "[cold] Fine. Keep your secrets, Theo. You're good at it.",
   ),
   "s-t-cover-t": T("Thank you.", "[relieved, to the guest, quiet] Thank you."),
-  // Grace answers it with her own
+  // Nina answers it with her own
   "s-g-confess": G(
     "Well. Since we're confessing.",
     "[shaky laugh] Well. Since we're confessing.",
@@ -260,12 +260,12 @@ export const SCRIPT = {
   ),
   "s-g-confess-t": T("You... what?", "[gutted] You... what?"),
 
-  // 5b. Grace's secret (the letter)
+  // 5b. Nina's secret (the letter)
   "s-g-t1": T(
     "What's this? 'We are delighted to offer you...' Lisbon?",
     "[reading, confused] What's this? [reading] 'We are delighted to offer you...' [beat] Lisbon?",
   ),
-  "s-g-g1": G("Trip, give me that.", "[alarmed] Trip, give me that."),
+  "s-g-g1": G("Theo, give me that.", "[alarmed] Theo, give me that."),
   "s-g-t2": T(
     "A residency? A year? When were you going to tell me?",
     "[rising anger] A residency? A year? When were you going to tell me?",
@@ -290,7 +290,7 @@ export const SCRIPT = {
     "That's not what anyone said.",
     "[uneasy] That's not what anyone said.",
   ),
-  // Trip answers it with his own
+  // Theo answers it with his own
   "s-t-confess": T(
     "Okay. Okay. Since we're doing this.",
     "[exhales, resigned] Okay. Okay. Since we're doing this.",
@@ -319,8 +319,8 @@ export const SCRIPT = {
     "[laughing through tears] Look at us. Eighty thousand dollars and a plane ticket.",
   ),
   "e-honest-t": T(
-    "Go to Lisbon, Grace. Paint. I'll sell the account and come visit.",
-    "[gentle, decided] Go to Lisbon, Grace. Paint. I'll sell the account and come visit.",
+    "Go to Lisbon, Nina. Paint. I'll sell the account and come visit.",
+    "[gentle, decided] Go to Lisbon, Nina. Paint. I'll sell the account and come visit.",
   ),
   "e-honest-g2": G("You hate flying.", "[teasing, soft] You hate flying."),
   "e-honest-t2": T("I'll take a boat.", "[laughing] I'll take a boat."),
@@ -347,10 +347,10 @@ export const SCRIPT = {
     "[calm, final] I can't do this anymore.",
   ),
   "e-fracture-g2": G(
-    "My bag's been packed for a week, Trip.",
-    "[quiet] My bag's been packed for a week, Trip.",
+    "My bag's been packed for a week, Theo.",
+    "[quiet] My bag's been packed for a week, Theo.",
   ),
-  "e-fracture-t": T("Grace. Grace, wait.", "[panicking] Grace. Grace, wait."),
+  "e-fracture-t": T("Nina. Nina, wait.", "[panicking] Nina. Nina, wait."),
   "e-fracture-t2": T(
     "Stay for one more drink?",
     "[hollow, to the guest] Stay for one more drink?",
@@ -428,8 +428,8 @@ export const SCRIPT = {
   ),
   "x-divorce-g": G("Maybe somebody should.", "[quiet] Maybe somebody should."),
   "x-therapy-g": G(
-    "We tried that. Trip checked his email the whole time.",
-    "[dry] We tried that. Trip checked his email the whole time.",
+    "We tried that. Theo checked his email the whole time.",
+    "[dry] We tried that. Theo checked his email the whole time.",
   ),
   "x-therapy-t": T("Once!", "[defensive] Once!"),
   "x-sorry-g": G("It's fine. It's fine.", "[softening] It's fine. It's fine."),
@@ -445,7 +445,7 @@ export const SCRIPT = {
   "x-question-t": T("Ha. Good question.", "[deflecting] Ha. Good question."),
   "x-question-g": G(
     "That's a good question.",
-    "[looking at Trip] That's a good question.",
+    "[looking at Theo] That's a good question.",
   ),
   "x-quiet-g": G(
     "You're very quiet tonight.",
@@ -557,7 +557,7 @@ export const SCRIPT = {
     "Did I ever tell you how I proposed? It's a great story.",
     "[warming up, to the guest] Did I ever tell you how I proposed? It's a great story.",
   ),
-  "w-g1": G("Trip, please don't.", "[mortified] Trip, please don't."),
+  "w-g1": G("Theo, please don't.", "[mortified] Theo, please don't."),
   "w-t2": T(
     "Christmas at her parents'. I stood on a chair in front of everybody. Eighteen people.",
     "[storyteller] Christmas at her parents'. I stood on a chair in front of everybody. Eighteen people.",
@@ -567,8 +567,8 @@ export const SCRIPT = {
     "[dry, pained] Twenty-two. I counted. While I was trying not to die.",
   ),
   "w-t3": T(
-    "And I said, Grace, you're the only painting I'll ever need.",
-    "[grandly, proud] And I said, [beat] Grace, you're the only painting I'll ever need.",
+    "And I said, Nina, you're the only painting I'll ever need.",
+    "[grandly, proud] And I said, [beat] Nina, you're the only painting I'll ever need.",
   ),
   "w-g3": G(
     "He'd been working on that line for a month.",
@@ -689,7 +689,7 @@ export const SCRIPT = {
     "Every party. Every single party, you do this.",
     "[frustrated] Every party. Every single party, you do this.",
   ),
-  "f-g2": G("Do what, Trip? Exist?", "[cutting] Do what, Trip? Exist?"),
+  "f-g2": G("Do what, Theo? Exist?", "[cutting] Do what, Theo? Exist?"),
   "f-g3": G(
     "You're doing the voice. The host voice.",
     "[mocking] You're doing the voice. The host voice.",
@@ -703,8 +703,8 @@ export const SCRIPT = {
     "[pleading, tired] Can we just have one nice night? One?",
   ),
   "f-g4": G(
-    "This is the nice night, Trip.",
-    "[hollow laugh] This is the nice night, Trip.",
+    "This is the nice night, Theo.",
+    "[hollow laugh] This is the nice night, Theo.",
   ),
 
   // You walked out
@@ -724,8 +724,8 @@ export const SCRIPT = {
 export type LineId = keyof typeof SCRIPT;
 
 export const VOICE: Record<Speaker, string> = {
-  TRIP: "iP95p4xoKVk53GoZ742B",
-  GRACE: "XrExE9yKIg1WjnnlVkGX",
+  THEO: "iP95p4xoKVk53GoZ742B",
+  NINA: "XrExE9yKIg1WjnnlVkGX",
 };
 
 export function lineVoice(id: LineId) {
@@ -748,7 +748,7 @@ export function nameVoice(raw: string, who: Speaker, tone: NameTone) {
   const n = cleanName(raw);
   if (!n) return null;
   const read =
-    who === "TRIP"
+    who === "THEO"
       ? tone === "exclaim"
         ? `[delighted, loud] ${n}!`
         : `[friendly] ${n},`

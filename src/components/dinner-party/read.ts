@@ -23,7 +23,7 @@ export const ACTS = [
 ] as const;
 export type Act = (typeof ACTS)[number];
 
-export const TARGETS = ["trip", "grace", "both", "none"] as const;
+export const TARGETS = ["theo", "nina", "both", "none"] as const;
 export type Target = (typeof TARGETS)[number];
 
 export const TOPICS = [
@@ -46,7 +46,7 @@ export type ReadContext = {
   /** The beat on stage, e.g. "painting". */
   beat: string;
   /** Who spoke last, so a bare "you" lands on them. */
-  lastSpeaker: "trip" | "grace" | null;
+  lastSpeaker: "theo" | "nina" | null;
   /** The last thing said to the guest, for the live reader. */
   lastLine: string;
   /** The question on the table, if they're waiting on an answer. */
@@ -114,15 +114,15 @@ const TOPIC_RULES: [Topic, RegExp][] = [
 
 /** Who a line is aimed at. A bare "you" lands on whoever just spoke. */
 function aim(t: string, last: ReadContext["lastSpeaker"]): Target {
-  const trip = /\b(trip|he|him|his|husband|man)\b/.test(t);
-  const grace = /\b(grace|she|her|hers|wife)\b/.test(t);
+  const theo = /\b(theo|he|him|his|husband|man)\b/.test(t);
+  const nina = /\b(nina|she|her|hers|wife)\b/.test(t);
   if (
     /\b(you two|both of you|you guys|y'?all|guys|you both|each other)\b/.test(t)
   )
     return "both";
-  if (trip && grace) return "both";
-  if (trip) return "trip";
-  if (grace) return "grace";
+  if (theo && nina) return "both";
+  if (theo) return "theo";
+  if (nina) return "nina";
   if (/\byou\b/.test(t) && last) return last;
   return last ?? "none";
 }
@@ -131,11 +131,11 @@ export function readOffline(said: string, ctx: ReadContext): Reading {
   const t = said.toLowerCase().replace(/[’]/g, "'").trim();
   const topics = TOPIC_RULES.filter(([, re]) => has(t, re)).map(([k]) => k);
   const target = aim(t, ctx.lastSpeaker);
-  // "Trip is wrong" praises nobody and criticises Trip; "Grace is right"
-  // agrees with Grace even though nobody said "agree".
-  const about = (who: "trip" | "grace") =>
+  // "Theo is wrong" praises nobody and criticises Theo; "Nina is right"
+  // agrees with Nina even though nobody said "agree".
+  const about = (who: "theo" | "nina") =>
     new RegExp(`\\b${who}(?:'s| is| was)? (?:right|being reasonable)`).test(t);
-  const against = (who: "trip" | "grace") =>
+  const against = (who: "theo" | "nina") =>
     new RegExp(
       `\\b${who}(?:'s| is| was)? (?:wrong|unfair|being unfair|selfish|a jerk|being a jerk|controlling)`,
     ).test(t);
@@ -149,16 +149,16 @@ export function readOffline(said: string, ctx: ReadContext): Reading {
   )
     act = "flirt";
   else if (has(t, LEAVE)) act = "leave";
-  else if (about("trip") || against("grace"))
+  else if (about("theo") || against("nina"))
     return {
-      act: about("trip") ? "agree" : "criticize",
-      target: about("trip") ? "trip" : "grace",
+      act: about("theo") ? "agree" : "criticize",
+      target: about("theo") ? "theo" : "nina",
       topics,
     };
-  else if (about("grace") || against("trip"))
+  else if (about("nina") || against("theo"))
     return {
-      act: about("grace") ? "agree" : "criticize",
-      target: about("grace") ? "grace" : "trip",
+      act: about("nina") ? "agree" : "criticize",
+      target: about("nina") ? "nina" : "theo",
       topics,
     };
   else if (has(t, SORRY)) act = "sorry";

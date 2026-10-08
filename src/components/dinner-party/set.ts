@@ -2,8 +2,8 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 
 /**
- * Trip and Grace's loft, built in code: a wood floor, a wall of steel-framed
- * windows onto the city at dusk, Grace's new canvas over the sofa, the bar
+ * Theo and Nina's loft, built in code: a wood floor, a wall of steel-framed
+ * windows onto the city at dusk, Nina's new canvas over the sofa, the bar
  * cart, and the Venice photo on the sideboard. Lit by practicals the way a
  * DP would: warm pendants, a cool window, one shadow-casting key.
  */
@@ -253,7 +253,7 @@ export function buildSet(scene: THREE.Scene, base: string): BuiltSet {
   city.position.set(-1, 2.2, -12);
   scene.add(city);
 
-  // Grace's canvas over the sofa
+  // Nina's canvas over the sofa
   const canvas = new THREE.Mesh(new THREE.BoxGeometry(1.05, 1.4, 0.04), [
     std(0xe8e2d6),
     std(0xe8e2d6),
@@ -375,7 +375,7 @@ export function buildSet(scene: THREE.Scene, base: string): BuiltSet {
   photoProp.add(frame);
   scene.add(photoProp);
 
-  // Trip's phone, face up on the sideboard
+  // Theo's phone, face up on the sideboard
   const phoneScreen = new THREE.MeshStandardMaterial({
     color: 0x05070a,
     emissive: 0x9fc4ff,
@@ -394,7 +394,7 @@ export function buildSet(scene: THREE.Scene, base: string): BuiltSet {
   phone.rotation.y = 0.3;
   scene.add(phone);
 
-  // Side table by the sofa, with Grace's letter half under a book
+  // Side table by the sofa, with Nina's letter half under a book
   const sideTable = new THREE.Group();
   const top = new THREE.Mesh(
     new THREE.CylinderGeometry(0.26, 0.26, 0.03, 32),

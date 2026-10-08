@@ -2,7 +2,7 @@ import { SCRIPT, type LineId } from "@/content/dinner-party-script";
 import type { Act, Reading, ReadContext, Topic } from "./read";
 
 /**
- * The drama manager, after Façade's. Trip and Grace run beats on their own;
+ * The drama manager, after Façade's. Theo and Nina run beats on their own;
  * which beat comes next depends on the tension, on who the guest has been
  * siding with, and on what the guest has touched or said. The guest can cut
  * in at any moment by talking, moving, or handling something, and every
@@ -10,7 +10,7 @@ import type { Act, Reading, ReadContext, Topic } from "./read";
  * at random, so no two nights play the same.
  */
 
-export type Who = "trip" | "grace";
+export type Who = "theo" | "nina";
 export type Mark =
   | "door"
   | "center-t"
@@ -108,9 +108,9 @@ class End extends Error {
 
 const pick = <T>(xs: readonly T[]) => xs[Math.floor(Math.random() * xs.length)];
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
-const other = (w: Who): Who => (w === "trip" ? "grace" : "trip");
+const other = (w: Who): Who => (w === "theo" ? "nina" : "theo");
 const speaker = (id: LineId): Who =>
-  SCRIPT[id].who === "TRIP" ? "trip" : "grace";
+  SCRIPT[id].who === "THEO" ? "theo" : "nina";
 
 /** The middle of the night: beats the manager deals from. */
 type BeatDef = {
@@ -122,11 +122,11 @@ type BeatDef = {
 
 export class Drama {
   s: State = {
-    trust: { trip: 0, grace: 0 },
+    trust: { theo: 0, nina: 0 },
     tension: 1,
     strikes: 0,
     flirts: 0,
-    secrets: { trip: false, grace: false },
+    secrets: { theo: false, nina: false },
     knows: { money: false, lisbon: false },
     beat: "door",
     beats: [],
@@ -163,7 +163,12 @@ export class Drama {
       return;
     this.moves.push(m);
     // Saying or doing something stops whoever's talking, Façade-style.
-    if (this.speaking && m.kind !== "near" && m.kind !== "away" && m.kind !== "space")
+    if (
+      this.speaking &&
+      m.kind !== "near" &&
+      m.kind !== "away" &&
+      m.kind !== "space"
+    )
       this.speaking.abort();
     this.wake?.();
   }
@@ -187,7 +192,7 @@ export class Drama {
       }
       await this.crisisBeat(
         this.crisis ??
-          (this.s.trust.grace >= this.s.trust.trip ? "trip" : "grace"),
+          (this.s.trust.nina >= this.s.trust.theo ? "theo" : "nina"),
       );
       await this.between();
       await this.question();
@@ -203,9 +208,9 @@ export class Drama {
     this.ev.onState?.({ ...this.s, trust: { ...this.s.trust } });
   }
 
-  shift(o: { trip?: number; grace?: number; tension?: number }) {
-    this.s.trust.trip = clamp(this.s.trust.trip + (o.trip ?? 0), -3, 3);
-    this.s.trust.grace = clamp(this.s.trust.grace + (o.grace ?? 0), -3, 3);
+  shift(o: { theo?: number; nina?: number; tension?: number }) {
+    this.s.trust.theo = clamp(this.s.trust.theo + (o.theo ?? 0), -3, 3);
+    this.s.trust.nina = clamp(this.s.trust.nina + (o.nina ?? 0), -3, 3);
     this.s.tension = clamp(this.s.tension + (o.tension ?? 0), 0, 10);
     this.emit();
     if (this.s.tension >= 10) throw new End("fracture");
@@ -365,24 +370,24 @@ export class Drama {
         await this.line(a, { mood: "angry" });
         this.cast.look(speaker(b), other(speaker(b)));
         await this.line(b, { mood: "angry" });
-        this.cast.look("trip", "guest");
-        this.cast.look("grace", "guest");
+        this.cast.look("theo", "guest");
+        this.cast.look("nina", "guest");
         this.shift({ tension: 1 });
       }
     }
-    // Trip's phone goes off now and then once the drinks are poured.
-    if (!this.s.secrets.trip && this.buzzes < 3 && Math.random() < 0.55) {
+    // Theo's phone goes off now and then once the drinks are poured.
+    if (!this.s.secrets.theo && this.buzzes < 3 && Math.random() < 0.55) {
       this.buzzes++;
       this.cast.buzz(true);
-      this.cast.react("trip", { face: "😳" });
-      this.cast.look("trip", "phone");
+      this.cast.react("theo", { face: "😳" });
+      this.cast.look("theo", "phone");
       await this.cast.wait(1600);
       this.cast.buzz(false);
-      this.cast.look("trip", "guest");
+      this.cast.look("theo", "guest");
       if (this.buzzes === 2) {
-        this.cast.look("grace", "trip");
+        this.cast.look("nina", "theo");
         await this.line("ph-g1", { mood: "neutral" });
-        this.cast.look("grace", "guest");
+        this.cast.look("nina", "guest");
         this.shift({ tension: 1 });
       }
     }
@@ -415,10 +420,10 @@ export class Drama {
         const w = m.who;
         this.cast.react(w, { mood: "happy", face: "🙂" });
         if (this.fresh(`x-hug-${w[0]}`))
-          await this.line(w === "trip" ? "x-hug-t" : "x-hug-g");
+          await this.line(w === "theo" ? "x-hug-t" : "x-hug-g");
         this.shift({ [w]: 0.5, tension: -0.5 });
-        if (w === "grace" && g.dist.trip < 3 && this.fresh("x-hug-jealous-t")) {
-          this.cast.look("trip", "guest");
+        if (w === "nina" && g.dist.theo < 3 && this.fresh("x-hug-jealous-t")) {
+          this.cast.look("theo", "guest");
           await this.line("x-hug-jealous-t");
         }
         return;
@@ -429,7 +434,7 @@ export class Drama {
         this.cast.react(other(w), { mood: "angry", face: "😠" });
         this.s.flirts++;
         if (this.s.flirts >= 2) throw new End("caught");
-        await this.line(w === "trip" ? "x-kiss-t" : "x-kiss-g");
+        await this.line(w === "theo" ? "x-kiss-t" : "x-kiss-g");
         this.shift({ [other(w)]: -1, tension: 2 });
         return;
       }
@@ -437,28 +442,28 @@ export class Drama {
         return this.touched(m.prop);
       case "drop":
         if (g.held === "drink" && this.fresh("x-putdown-t")) {
-          this.cast.react("trip", { face: "😐" });
+          this.cast.react("theo", { face: "😐" });
           await this.line("x-putdown-t");
         }
         this.cast.hand(null);
         return;
       case "sip":
-        this.cast.react("trip", { mood: "happy", face: "😄" });
+        this.cast.react("theo", { mood: "happy", face: "😄" });
         if (this.fresh("x-sip-t")) {
           await this.line("x-sip-t");
-          this.shift({ trip: 0.3 });
+          this.shift({ theo: 0.3 });
         }
         return;
       case "give":
         this.cast.hand(null);
-        if (m.who === "grace") {
-          this.cast.react("grace", { mood: "happy", face: "🙂" });
+        if (m.who === "nina") {
+          this.cast.react("nina", { mood: "happy", face: "🙂" });
           await this.line("x-give-g");
-          this.cast.react("trip", { face: "😐" });
+          this.cast.react("theo", { face: "😐" });
           await this.line("x-give-t");
-          this.shift({ grace: 0.5, trip: -0.3 });
+          this.shift({ nina: 0.5, theo: -0.3 });
         } else {
-          this.cast.react("trip", { mood: "happy", face: "😄" });
+          this.cast.react("theo", { mood: "happy", face: "😄" });
           await this.line("x-thanks-t");
         }
         return;
@@ -472,20 +477,20 @@ export class Drama {
         return;
       case "near":
         if (m.spot === "door" && this.fresh("x-leave-t")) {
-          this.cast.react("trip", { face: "😳" });
+          this.cast.react("theo", { face: "😳" });
           await this.line("x-leave-t");
         }
         if (
           m.spot === "closet" &&
-          !this.s.secrets.grace &&
+          !this.s.secrets.nina &&
           this.fresh("x-away-g")
         ) {
-          this.cast.look("grace", "guest");
+          this.cast.look("nina", "guest");
           await this.line("x-away-g");
         }
         return;
       case "space": {
-        const id = m.who === "trip" ? "x-space-t" : "x-space-g";
+        const id = m.who === "theo" ? "x-space-t" : "x-space-g";
         if (this.fresh(id)) {
           this.cast.react(m.who, { face: "😳" });
           await this.line(id);
@@ -493,8 +498,8 @@ export class Drama {
         return;
       }
       case "away": {
-        const who: Who = g.dist.trip < g.dist.grace ? "trip" : "grace";
-        const id = who === "trip" ? "x-away-t" : "x-away-g";
+        const who: Who = g.dist.theo < g.dist.nina ? "theo" : "nina";
+        const id = who === "theo" ? "x-away-t" : "x-away-g";
         if (this.fresh(id)) await this.line(id);
         return;
       }
@@ -509,9 +514,9 @@ export class Drama {
         this.cast.hand("photo");
         if (!this.s.beats.includes("venice")) {
           this.next = "venice";
-          this.cast.react("trip", { mood: "happy", face: "😄" });
+          this.cast.react("theo", { mood: "happy", face: "😄" });
         } else if (this.fresh("x-photo-g")) {
-          this.cast.react("grace", { face: "🙄" });
+          this.cast.react("nina", { face: "🙄" });
           await this.line("x-photo-g");
         }
         return;
@@ -521,8 +526,8 @@ export class Drama {
           await this.line("x-bottle-t", { gesture: "handup" });
         return;
       case "painting":
-        this.cast.react("grace", { mood: "happy" });
-        this.shift({ grace: 0.3 });
+        this.cast.react("nina", { mood: "happy" });
+        this.shift({ nina: 0.3 });
         if (!this.s.beats.includes("painting")) {
           this.next = "painting";
           if (this.fresh("x-painting-g")) await this.line("x-painting-g");
@@ -532,33 +537,33 @@ export class Drama {
         this.cast.hand("phone");
         this.cast.reveal("phone");
         this.s.knows.money = true;
-        if (!this.s.secrets.trip) {
-          this.cast.react("trip", { face: "😳", mood: "fear" });
+        if (!this.s.secrets.theo) {
+          this.cast.react("theo", { face: "😳", mood: "fear" });
           await this.line("ph-t1");
           await this.line("ph-t2");
           this.cast.hand(null);
-          this.crisis = this.crisis ?? "trip";
+          this.crisis = this.crisis ?? "theo";
         }
         return;
       case "letter":
         this.cast.hand("letter");
         this.cast.reveal("letter");
         this.s.knows.lisbon = true;
-        if (!this.s.secrets.grace && this.cast.guest().dist.grace < 3.5) {
-          this.cast.react("grace", { face: "😳", mood: "fear" });
-          this.cast.look("grace", "guest");
+        if (!this.s.secrets.nina && this.cast.guest().dist.nina < 3.5) {
+          this.cast.react("nina", { face: "😳", mood: "fear" });
+          this.cast.look("nina", "guest");
         }
         return;
       case "suitcase":
-        if (!this.s.secrets.grace && this.fresh("su-g1")) {
-          this.cast.react("grace", { face: "😳", mood: "fear" });
-          this.cast.look("grace", "closet");
-          this.cast.look("trip", "closet");
+        if (!this.s.secrets.nina && this.fresh("su-g1")) {
+          this.cast.react("nina", { face: "😳", mood: "fear" });
+          this.cast.look("nina", "closet");
+          this.cast.look("theo", "closet");
           await this.lines("su-g1", "su-t1", "su-g2");
-          this.cast.look("grace", "guest");
-          this.cast.look("trip", "grace");
+          this.cast.look("nina", "guest");
+          this.cast.look("theo", "nina");
           this.shift({ tension: 1 });
-          this.crisis = this.crisis ?? "grace";
+          this.crisis = this.crisis ?? "nina";
         }
         return;
     }
@@ -568,27 +573,27 @@ export class Drama {
   async answer(r: Reading) {
     const { act } = r;
     const target: Who | null =
-      r.target === "trip" || r.target === "grace" ? r.target : null;
+      r.target === "theo" || r.target === "nina" ? r.target : null;
     // Sore points come first: they change the night.
     if (await this.sore(r.topics)) return;
     switch (act) {
       case "insult": {
-        const w = target ?? this.lastSpeaker ?? "trip";
+        const w = target ?? this.lastSpeaker ?? "theo";
         this.cast.react(w, { mood: "angry", face: "😠" });
         this.cast.react(other(w), { face: "😳" });
-        await this.line(w === "trip" ? "x-insult-t" : "x-insult-g");
+        await this.line(w === "theo" ? "x-insult-t" : "x-insult-g");
         this.shift({ [w]: -1.5, tension: 1 });
         return;
       }
       case "flirt": {
-        const w = target ?? "grace";
-        if (w === "grace") {
-          this.cast.react("grace", { face: "😳", mood: "happy" });
-          this.cast.react("trip", { face: "😐" });
+        const w = target ?? "nina";
+        if (w === "nina") {
+          this.cast.react("nina", { face: "😳", mood: "happy" });
+          this.cast.react("theo", { face: "😐" });
           await this.lines("x-flirt-g-g", "x-flirt-g-t");
         } else {
-          this.cast.react("trip", { mood: "happy", face: "😄" });
-          this.cast.react("grace", { face: "🙄" });
+          this.cast.react("theo", { mood: "happy", face: "😄" });
+          this.cast.react("nina", { face: "🙄" });
           await this.lines("x-flirt-t-t", "x-flirt-t-g");
         }
         this.shift({ [w]: 0.5, [other(w)]: -1, tension: 1 });
@@ -600,9 +605,9 @@ export class Drama {
         if (!w) return this.ack(null);
         this.cast.react(w, { mood: "happy", face: "🙂" });
         this.cast.react(other(w), { face: "🙄" });
-        if (w === "trip" && this.fresh("x-praise-t", 2))
+        if (w === "theo" && this.fresh("x-praise-t", 2))
           await this.lines("x-praise-t", "x-praise-t-g");
-        else if (w === "grace" && this.fresh("x-praise-g", 2))
+        else if (w === "nina" && this.fresh("x-praise-g", 2))
           await this.lines("x-praise-g", "x-praise-g-t");
         this.shift({ [w]: 0.8, [other(w)]: -0.4, tension: 0.5 });
         return;
@@ -613,38 +618,38 @@ export class Drama {
         if (!w) return this.ack(null);
         this.cast.react(w, { mood: "sad", face: "😠" });
         this.cast.react(other(w), { face: "😏" });
-        if (w === "trip" && this.fresh("x-crit-t", 2))
+        if (w === "theo" && this.fresh("x-crit-t", 2))
           await this.lines("x-crit-t", "x-crit-t-g");
-        else if (w === "grace" && this.fresh("x-crit-g", 2))
+        else if (w === "nina" && this.fresh("x-crit-g", 2))
           await this.lines("x-crit-g", "x-crit-g-t");
         this.shift({ [w]: -0.8, [other(w)]: 0.4, tension: 1 });
         return;
       }
       case "calm":
-        this.cast.react("trip", { face: "😳" });
+        this.cast.react("theo", { face: "😳" });
         if (this.fresh("x-calm-t", 2)) await this.lines("x-calm-t", "x-calm-g");
         this.shift({ tension: -1 });
         return;
       case "sorry":
-        this.cast.react("grace", { mood: "neutral", face: "🙂" });
+        this.cast.react("nina", { mood: "neutral", face: "🙂" });
         if (this.fresh("x-sorry-g", 2)) await this.line("x-sorry-g");
         this.shift({ tension: -0.5 });
         return;
       case "thank":
-        this.cast.react("trip", { mood: "happy", face: "😄" });
+        this.cast.react("theo", { mood: "happy", face: "😄" });
         if (this.fresh("x-thanks-t", 2)) await this.line("x-thanks-t");
         return;
       case "greet":
         if (this.fresh("x-hi-t")) await this.line("x-hi-t");
-        else this.cast.react("trip", { face: "😄" });
+        else this.cast.react("theo", { face: "😄" });
         return;
       case "leave":
-        this.cast.react("trip", { face: "😳" });
+        this.cast.react("theo", { face: "😳" });
         if (this.fresh("x-leave-t", 2)) await this.line("x-leave-t");
         return;
       case "question":
-        if (this.fresh(`x-question-${(target ?? "trip")[0]}`))
-          await this.line(target === "grace" ? "x-question-g" : "x-question-t");
+        if (this.fresh(`x-question-${(target ?? "theo")[0]}`))
+          await this.line(target === "nina" ? "x-question-g" : "x-question-t");
         else this.ack(target);
         return;
       default:
@@ -654,9 +659,9 @@ export class Drama {
 
   /** Acknowledges something without taking it anywhere. */
   private async ack(target: Who | null) {
-    const w = target ?? this.lastSpeaker ?? pick(["trip", "grace"] as const);
+    const w = target ?? this.lastSpeaker ?? pick(["theo", "nina"] as const);
     const ids: LineId[] =
-      w === "trip" ? ["x-ack-t", "x-ack-t2"] : ["x-ack-g", "x-ack-g2"];
+      w === "theo" ? ["x-ack-t", "x-ack-t2"] : ["x-ack-g", "x-ack-g2"];
     const id = ids.find((i) => this.fresh(i, 2));
     if (id) await this.line(id);
     else this.cast.react(w, { face: pick(["🙂", "😐"]) });
@@ -666,32 +671,32 @@ export class Drama {
   private async sore(topics: Topic[]) {
     if (
       topics.includes("lisbon") &&
-      !this.s.secrets.grace &&
+      !this.s.secrets.nina &&
       this.onceOnly("lisbon")
     ) {
-      this.cast.react("grace", { face: "😳", mood: "fear" });
-      this.cast.look("trip", "grace");
+      this.cast.react("nina", { face: "😳", mood: "fear" });
+      this.cast.look("theo", "nina");
       await this.lines("x-lisbon-g", "x-lisbon-t");
       this.shift({ tension: 2 });
-      this.crisis = this.crisis ?? "grace";
+      this.crisis = this.crisis ?? "nina";
       return true;
     }
     if (
       topics.includes("money") &&
       (this.s.knows.money || this.s.beats.includes("sofa")) &&
-      !this.s.secrets.trip &&
+      !this.s.secrets.theo &&
       this.onceOnly("money")
     ) {
-      this.cast.react("trip", { face: "😳", mood: "fear" });
-      this.cast.look("grace", "trip");
+      this.cast.react("theo", { face: "😳", mood: "fear" });
+      this.cast.look("nina", "theo");
       await this.lines("x-money-t", "x-money-g");
       this.shift({ tension: 2 });
-      this.crisis = this.crisis ?? "trip";
+      this.crisis = this.crisis ?? "theo";
       return true;
     }
     if (topics.includes("divorce") && this.onceOnly("divorce")) {
-      this.cast.react("trip", { face: "😳" });
-      this.cast.react("grace", { mood: "sad" });
+      this.cast.react("theo", { face: "😳" });
+      this.cast.react("nina", { mood: "sad" });
       await this.lines("x-divorce-t", "x-divorce-g");
       this.shift({ tension: 2 });
       return true;
@@ -727,23 +732,23 @@ export class Drama {
     this.cast.sfx("door-open");
     this.s.beat = "arrival";
     this.emit();
-    this.cast.look("trip", "guest");
-    this.cast.look("grace", "guest");
+    this.cast.look("theo", "guest");
+    this.cast.look("nina", "guest");
     await this.line(pick(["a-t1", "a-t1b"] as const), {
       mood: "happy",
       gesture: "handup",
     });
-    this.cast.walk("trip", "center-t");
-    void this.cast.walk("grace", "center-g");
+    this.cast.walk("theo", "center-t");
+    void this.cast.walk("nina", "center-g");
     await this.cast.wait(700);
     await this.line(pick(["a-g1", "a-g1b"] as const), { mood: "happy" });
     await this.line("a-t2", { mood: "happy" });
     if (Math.random() < 0.7) {
-      this.cast.look("grace", "trip");
+      this.cast.look("nina", "theo");
       await this.line("a-g2");
-      this.cast.react("trip", { face: "😳" });
+      this.cast.react("theo", { face: "😳" });
       await this.line("a-t3", { look: "guest" });
-      this.cast.look("grace", "guest");
+      this.cast.look("nina", "guest");
       this.shift({ tension: 1 });
     }
   }
@@ -752,9 +757,9 @@ export class Drama {
     this.s.beat = "drinks";
     this.s.beats.push("drinks");
     this.emit();
-    void this.cast.walk("trip", "bar");
-    await this.line("k-g1", { look: "trip" });
-    this.cast.look("grace", "guest");
+    void this.cast.walk("theo", "bar");
+    await this.line("k-g1", { look: "theo" });
+    this.cast.look("nina", "guest");
     const asking = "What can I get you?";
     await this.line(pick(["k-t1", "k-t1b"] as const), { look: "guest" });
     const m = await this.hold(
@@ -772,29 +777,29 @@ export class Drama {
     if (r && (r.act === "insult" || r.act === "flirt" || r.act === "eject"))
       await this.answer(r);
     else if (stance === "strong") {
-      this.cast.react("trip", { mood: "happy", face: "😄" });
-      this.cast.react("grace", { face: "🙄" });
+      this.cast.react("theo", { mood: "happy", face: "😄" });
+      this.cast.react("nina", { face: "🙄" });
       await this.line("k-strong-t", { gesture: "thumbup" });
       await this.line("k-strong-g");
-      this.shift({ trip: 1, grace: -0.3 });
+      this.shift({ theo: 1, nina: -0.3 });
     } else if (stance === "water") {
-      this.cast.react("grace", { mood: "happy", face: "🙂" });
+      this.cast.react("nina", { mood: "happy", face: "🙂" });
       await this.line("k-water-g");
-      this.cast.react("trip", { face: "😐" });
+      this.cast.react("theo", { face: "😐" });
       await this.line("k-water-t", { gesture: "shrug" });
-      this.shift({ grace: 1, trip: -0.3 });
+      this.shift({ nina: 1, theo: -0.3 });
     } else await this.line("k-other-t", { gesture: "index" });
     this.cast.sfx("pour");
-    await this.line("k-t2", { look: "grace" });
+    await this.line("k-t2", { look: "nina" });
     await this.line("k-g2");
     if (Math.random() < 0.6) {
       await this.line("k-t3", { look: "guest" });
-      await this.line("k-g3", { look: "trip" });
-      this.cast.look("grace", "guest");
+      await this.line("k-g3", { look: "theo" });
+      this.cast.look("nina", "guest");
       this.shift({ tension: 1 });
     }
-    // Trip brings it over.
-    await this.cast.walk("trip", "center-t");
+    // Theo brings it over.
+    await this.cast.walk("theo", "center-t");
     this.cast.hand("drink");
     await this.line("k-hand-t", { mood: "happy" });
   }
@@ -806,17 +811,17 @@ export class Drama {
     this.s.beats.push(this.s.beat);
     this.emit();
     this.shift({ tension: 1 });
-    if (who === "trip") {
+    if (who === "theo") {
       this.cast.buzz(true);
-      this.cast.look("grace", "phone");
+      this.cast.look("nina", "phone");
       await this.cast.wait(1200);
       this.cast.buzz(false);
-      this.cast.look("grace", "trip");
+      this.cast.look("nina", "theo");
       await this.line("s-t-g1", { mood: "angry" });
-      await this.line("s-t-t1", { look: "grace" });
+      await this.line("s-t-t1", { look: "nina" });
       await this.line("s-t-g2", { mood: "angry" });
       await this.line("s-t-t2", { mood: "fear", look: "guest" });
-      this.cast.look("grace", "guest");
+      this.cast.look("nina", "guest");
       const asking = "Press him, or cover for him?";
       const m = await this.hold(asking, 15000);
       const r = await this.readMove(m, asking);
@@ -824,68 +829,68 @@ export class Drama {
         !!r &&
         (r.topics.includes("money") ||
           r.act === "question" ||
-          (r.target === "trip" &&
+          (r.target === "theo" &&
             (r.act === "criticize" || r.act === "disagree")) ||
-          (r.target === "grace" && (r.act === "agree" || r.act === "praise")));
+          (r.target === "nina" && (r.act === "agree" || r.act === "praise")));
       if (press || this.s.knows.money) {
-        this.cast.react("trip", { mood: "sad" });
+        this.cast.react("theo", { mood: "sad" });
         await this.line("s-t-press-t", { mood: "angry" });
-        this.cast.react("grace", { face: "😳", mood: "fear" });
+        this.cast.react("nina", { face: "😳", mood: "fear" });
         await this.line("s-t-press-g");
         await this.line("s-t-press-t2", { mood: "sad" });
-        this.s.secrets.trip = true;
-        this.shift({ tension: 2, grace: 0.5 });
-        if (this.s.trust.grace >= 0 && !this.s.secrets.grace) {
+        this.s.secrets.theo = true;
+        this.shift({ tension: 2, nina: 0.5 });
+        if (this.s.trust.nina >= 0 && !this.s.secrets.nina) {
           await this.cast.wait(900);
           await this.line("s-g-confess", { mood: "sad" });
           await this.line("s-g-confess2", { mood: "sad" });
-          this.cast.react("trip", { face: "😳", mood: "fear" });
+          this.cast.react("theo", { face: "😳", mood: "fear" });
           await this.line("s-g-confess-t");
-          this.s.secrets.grace = true;
+          this.s.secrets.nina = true;
           this.shift({ tension: 1 });
         }
       } else {
         await this.line("s-t-cover-g", { mood: "angry" });
         await this.line("s-t-cover-t");
-        this.shift({ trip: 1, grace: -1, tension: 1 });
+        this.shift({ theo: 1, nina: -1, tension: 1 });
       }
     } else {
-      await this.cast.walk("trip", "table");
-      this.cast.look("trip", "grace");
+      await this.cast.walk("theo", "table");
+      this.cast.look("theo", "nina");
       await this.line("s-g-t1");
-      this.cast.react("grace", { face: "😳", mood: "fear" });
-      await this.line("s-g-g1", { look: "trip" });
+      this.cast.react("nina", { face: "😳", mood: "fear" });
+      await this.line("s-g-g1", { look: "theo" });
       await this.line("s-g-t2", { mood: "angry" });
       await this.line("s-g-g2", { mood: "angry" });
-      this.cast.look("trip", "guest");
-      this.cast.look("grace", "guest");
+      this.cast.look("theo", "guest");
+      this.cast.look("nina", "guest");
       const asking = "Defend her, or side with him?";
       const m = await this.hold(asking, 15000);
       const r = await this.readMove(m, asking);
       const condemn =
         !!r &&
-        ((r.target === "grace" &&
+        ((r.target === "nina" &&
           (r.act === "criticize" ||
             r.act === "disagree" ||
             r.act === "insult")) ||
-          (r.target === "trip" && (r.act === "agree" || r.act === "praise")));
-      this.s.secrets.grace = true;
+          (r.target === "theo" && (r.act === "agree" || r.act === "praise")));
+      this.s.secrets.nina = true;
       if (condemn) {
-        this.cast.react("grace", { mood: "angry", face: "😠" });
+        this.cast.react("nina", { mood: "angry", face: "😠" });
         await this.line("s-g-condemn-g");
         await this.line("s-g-condemn-t");
-        this.shift({ grace: -2, tension: 3 });
+        this.shift({ nina: -2, tension: 3 });
       } else {
         await this.line("s-g-defend-t", { mood: "sad" });
         await this.line("s-g-defend-g");
-        this.shift({ grace: r ? 1 : 0, tension: 1 });
-        if (this.s.trust.trip >= 0 && !this.s.secrets.trip) {
+        this.shift({ nina: r ? 1 : 0, tension: 1 });
+        if (this.s.trust.theo >= 0 && !this.s.secrets.theo) {
           await this.cast.wait(900);
           await this.line("s-t-confess", { mood: "sad" });
           await this.line("s-t-confess2", { mood: "sad" });
-          this.cast.react("grace", { face: "😳" });
+          this.cast.react("nina", { face: "😳" });
           await this.line("s-t-confess-g");
-          this.s.secrets.trip = true;
+          this.s.secrets.theo = true;
           this.shift({ tension: 1 });
         }
       }
@@ -896,10 +901,10 @@ export class Drama {
     this.s.beat = "question";
     this.s.beats.push("question");
     this.emit();
-    this.cast.walk("trip", "center-t");
-    await this.cast.walk("grace", "center-g");
-    this.cast.look("trip", "guest");
-    this.cast.look("grace", "guest");
+    this.cast.walk("theo", "center-t");
+    await this.cast.walk("nina", "center-g");
+    this.cast.look("theo", "guest");
+    this.cast.look("nina", "guest");
     await this.line("q-g1", { mood: "sad" });
     await this.line("q-t1", { mood: "sad" });
     await this.line("q-g2", { mood: "sad" });
@@ -912,10 +917,10 @@ export class Drama {
       ending = "fracture";
     else if (r && (r.act === "agree" || r.act === "praise" || r.act === "calm"))
       ending =
-        s.secrets.trip &&
-        s.secrets.grace &&
-        s.trust.trip >= 0 &&
-        s.trust.grace >= 0 &&
+        s.secrets.theo &&
+        s.secrets.nina &&
+        s.trust.theo >= 0 &&
+        s.trust.nina >= 0 &&
         s.tension < 8
           ? "honest"
           : "recommit";
@@ -938,8 +943,8 @@ export class Drama {
       const ac = new AbortController();
       await this.cast.say(id, { ...o, signal: ac.signal });
     };
-    this.cast.look("trip", "guest");
-    this.cast.look("grace", "guest");
+    this.cast.look("theo", "guest");
+    this.cast.look("nina", "guest");
     switch (e) {
       case "honest":
         await say("e-honest-g", { mood: "happy" });
@@ -949,24 +954,24 @@ export class Drama {
         await say("e-honest-g3", { mood: "happy" });
         break;
       case "recommit":
-        this.cast.look("grace", "trip");
+        this.cast.look("nina", "theo");
         await say("e-recommit-g", { mood: "sad" });
-        this.cast.look("trip", "grace");
+        this.cast.look("theo", "nina");
         await say("e-recommit-t", { mood: "love" });
-        this.cast.look("grace", "closet");
-        this.cast.look("trip", "guest");
+        this.cast.look("nina", "closet");
+        this.cast.look("theo", "guest");
         await say("e-recommit-t2", { mood: "happy" });
         break;
       case "fracture":
-        this.cast.look("grace", "trip");
+        this.cast.look("nina", "theo");
         await say("e-fracture-g", { mood: "sad" });
         await say("e-fracture-g2", { mood: "sad" });
-        void this.cast.walk("grace", "door");
+        void this.cast.walk("nina", "door");
         await say("e-fracture-t", { mood: "fear" });
         await this.cast.wait(1800);
         this.cast.sfx("door-shut");
         await this.cast.wait(1200);
-        this.cast.look("trip", "guest");
+        this.cast.look("theo", "guest");
         await say("e-fracture-t2", { mood: "sad" });
         break;
       case "caught":
@@ -983,7 +988,7 @@ export class Drama {
         break;
       case "left":
         if (this.s.beat !== "door") {
-          this.cast.react("trip", { face: "😳" });
+          this.cast.react("theo", { face: "😳" });
           await say("e-left-t", { mood: "fear" });
         }
         this.cast.sfx("door-shut");
@@ -1004,67 +1009,67 @@ const MIDDLE: BeatDef[] = [
     async run(d) {
       const c = d.cast;
       if (Math.random() < 0.6) {
-        // Grace shows you herself, and watches whether you come.
-        await c.walk("grace", "painting");
-        c.look("grace", "guest");
+        // Nina shows you herself, and watches whether you come.
+        await c.walk("nina", "painting");
+        c.look("nina", "guest");
         await d.line("p-g0", { mood: "happy" });
-        c.look("grace", "painting");
+        c.look("nina", "painting");
         const came = await d.hold(
           "Go and look at the painting",
           9000,
           (m) => m.kind === "near" && m.spot === "painting",
         );
         if (came) {
-          d.shift({ grace: 0.6 });
+          d.shift({ nina: 0.6 });
           await d.line("p-near-g", { mood: "happy" });
         } else {
-          d.shift({ grace: -0.5 });
-          c.look("grace", "guest");
+          d.shift({ nina: -0.5 });
+          c.look("nina", "guest");
           await d.line("p-far-g", { mood: "sad" });
         }
-        c.look("trip", "painting");
+        c.look("theo", "painting");
         await d.line("p-t2", { look: "guest" });
-        await d.line("p-g1", { mood: "sad", look: "trip" });
+        await d.line("p-g1", { mood: "sad", look: "theo" });
         await d.line("p-t3");
       } else {
-        // Trip shows it off for her.
+        // Theo shows it off for her.
         await d.line("p-t1", { mood: "happy", gesture: "index" });
-        c.look("trip", "painting");
+        c.look("theo", "painting");
         await d.line("p-t2");
-        c.react("grace", { face: "😐" });
+        c.react("nina", { face: "😐" });
         await d.line("p-g1", { mood: "sad" });
         await d.line("p-t3");
       }
-      c.look("grace", "guest");
-      c.look("trip", "guest");
+      c.look("nina", "guest");
+      c.look("theo", "guest");
       const asking = "What do you see when you look at it?";
       await d.line("p-g2");
       const m = await d.hold(asking, 15000);
       const r = await d.readMove(m, asking);
       const g = c.guest();
       // Standing beside her as you answer counts for something too.
-      if (g.dist.grace + 0.8 < g.dist.trip) d.shift({ grace: 0.3 });
+      if (g.dist.nina + 0.8 < g.dist.theo) d.shift({ nina: 0.3 });
       const love =
-        r && (r.act === "praise" || (r.act === "agree" && r.target !== "trip"));
+        r && (r.act === "praise" || (r.act === "agree" && r.target !== "theo"));
       const hate =
         r &&
         (r.act === "criticize" ||
           r.act === "insult" ||
-          (r.target === "trip" && r.act === "agree"));
+          (r.target === "theo" && r.act === "agree"));
       if (r && (r.act === "flirt" || r.act === "insult")) await d.answer(r);
       if (love) {
-        c.react("grace", { mood: "happy", face: "🙂" });
+        c.react("nina", { mood: "happy", face: "🙂" });
         await d.line("p-love-g");
-        c.react("trip", { face: "😳" });
-        await d.line("p-love-t", { look: "grace" });
-        await d.line("p-love-g2", { look: "trip" });
-        d.shift({ grace: 1, trip: -0.5, tension: 1 });
+        c.react("theo", { face: "😳" });
+        await d.line("p-love-t", { look: "nina" });
+        await d.line("p-love-g2", { look: "theo" });
+        d.shift({ nina: 1, theo: -0.5, tension: 1 });
       } else if (hate) {
-        c.react("trip", { mood: "happy", face: "😄" });
+        c.react("theo", { mood: "happy", face: "😄" });
         await d.line("p-hate-t");
-        c.react("grace", { mood: "sad", face: "😠" });
+        c.react("nina", { mood: "sad", face: "😠" });
         await d.line("p-hate-g");
-        d.shift({ trip: 1, grace: -1, tension: 2 });
+        d.shift({ theo: 1, nina: -1, tension: 2 });
       } else {
         await d.line("p-meh-g");
         await d.line("p-meh-t", { mood: "happy" });
@@ -1074,7 +1079,7 @@ const MIDDLE: BeatDef[] = [
         await d.line("p-t4", { look: "guest" });
         d.shift({ tension: 1 });
       }
-      c.look("grace", "guest");
+      c.look("nina", "guest");
     },
   },
   {
@@ -1084,62 +1089,62 @@ const MIDDLE: BeatDef[] = [
       const c = d.cast;
       const found = c.guest().held === "photo";
       if (found) {
-        c.look("trip", "guest");
+        c.look("theo", "guest");
         await d.line("v-found-t", { mood: "happy", gesture: "index" });
       } else {
-        await c.walk("trip", "sideboard");
-        c.look("trip", "photo");
+        await c.walk("theo", "sideboard");
+        c.look("theo", "photo");
         await d.line("v-t1", { mood: "happy" });
-        c.look("trip", "guest");
-        await c.walk("trip", "center-t");
+        c.look("theo", "guest");
+        await c.walk("theo", "center-t");
       }
       await d.line("v-t2", { mood: "love" });
-      c.look("grace", "trip");
+      c.look("nina", "theo");
       await d.line("v-g1", { look: "guest" });
-      await d.line("v-t3", { look: "grace", mood: "angry" });
+      await d.line("v-t3", { look: "nina", mood: "angry" });
       await d.line("v-g2");
       await d.line("v-t4", { mood: "sad" });
       await d.line("v-g3");
       await d.line("v-t5", { look: "guest", gesture: "shrug" });
       // An argument: whoever you stand nearer reads it as taking sides.
       const g = c.guest();
-      if (Math.abs(g.dist.trip - g.dist.grace) > 0.8)
+      if (Math.abs(g.dist.theo - g.dist.nina) > 0.8)
         d.shift(
-          g.dist.trip < g.dist.grace
-            ? { trip: 0.4, grace: -0.2 }
-            : { grace: 0.4, trip: -0.2 },
+          g.dist.theo < g.dist.nina
+            ? { theo: 0.4, nina: -0.2 }
+            : { nina: 0.4, theo: -0.2 },
         );
-      await d.line("v-g4", { mood: "angry", look: "trip" });
+      await d.line("v-g4", { mood: "angry", look: "theo" });
       await d.line("v-t6", { look: "guest" });
-      await d.line("v-g5", { look: "trip" });
+      await d.line("v-g5", { look: "theo" });
       d.shift({ tension: 1 });
-      c.look("grace", "guest");
-      c.look("trip", "guest");
+      c.look("nina", "guest");
+      c.look("theo", "guest");
       const asking = "Who's being unfair here?";
       await d.line("v-g6");
       const m = await d.hold(asking, 15000);
       const r = await d.readMove(m, asking);
       const forGrace =
         r &&
-        ((r.target === "grace" && (r.act === "agree" || r.act === "praise")) ||
-          (r.target === "trip" &&
+        ((r.target === "nina" && (r.act === "agree" || r.act === "praise")) ||
+          (r.target === "theo" &&
             (r.act === "criticize" || r.act === "insult")));
       const forTrip =
         r &&
-        ((r.target === "trip" && (r.act === "agree" || r.act === "praise")) ||
-          (r.target === "grace" &&
+        ((r.target === "theo" && (r.act === "agree" || r.act === "praise")) ||
+          (r.target === "nina" &&
             (r.act === "criticize" || r.act === "insult")));
       if (r && (r.act === "flirt" || r.act === "insult")) await d.answer(r);
       if (forGrace) {
-        c.react("trip", { mood: "angry", face: "😠" });
-        await d.line("v-grace-t");
-        await d.line("v-grace-g", { mood: "happy" });
-        d.shift({ grace: 1, trip: -1, tension: 2 });
+        c.react("theo", { mood: "angry", face: "😠" });
+        await d.line("v-nina-t");
+        await d.line("v-nina-g", { mood: "happy" });
+        d.shift({ nina: 1, theo: -1, tension: 2 });
       } else if (forTrip) {
-        c.react("grace", { mood: "sad", face: "🙄" });
-        await d.line("v-trip-g");
-        await d.line("v-trip-t", { mood: "sad" });
-        d.shift({ trip: 1, grace: -1, tension: 2 });
+        c.react("nina", { mood: "sad", face: "🙄" });
+        await d.line("v-theo-g");
+        await d.line("v-theo-t", { mood: "sad" });
+        d.shift({ theo: 1, nina: -1, tension: 2 });
       } else {
         await d.line("v-both-g");
         await d.line("v-both-t");
@@ -1152,13 +1157,13 @@ const MIDDLE: BeatDef[] = [
     band: [1, 5],
     async run(d) {
       const c = d.cast;
-      await c.walk("grace", "sofa-side");
-      c.look("grace", "guest");
+      await c.walk("nina", "sofa-side");
+      c.look("nina", "guest");
       await d.line("r-g1");
-      await d.line("r-t1", { look: "grace" });
-      await d.line("r-g2", { look: "trip" });
+      await d.line("r-t1", { look: "nina" });
+      await d.line("r-g2", { look: "theo" });
       await d.line("r-t2", { gesture: "index" });
-      c.look("grace", "guest");
+      c.look("nina", "guest");
       const asking = "What do you think of the sofa?";
       await d.line("r-g3");
       const m = await d.hold(
@@ -1170,7 +1175,7 @@ const MIDDLE: BeatDef[] = [
         // Sitting on it is an answer of sorts.
         await d.line("r-like-t", { mood: "happy" });
         await d.line("r-like-g");
-        d.shift({ trip: 0.5 });
+        d.shift({ theo: 0.5 });
         return;
       }
       const r = await d.readMove(m, asking);
@@ -1179,23 +1184,23 @@ const MIDDLE: BeatDef[] = [
       if (act === "praise" || act === "agree") {
         await d.line("r-like-t", { mood: "happy" });
         await d.line("r-like-g");
-        d.shift({ trip: 0.8, grace: -0.5 });
+        d.shift({ theo: 0.8, nina: -0.5 });
       } else if (act === "criticize" || act === "disagree") {
-        c.react("grace", { mood: "happy", face: "😄" });
+        c.react("nina", { mood: "happy", face: "😄" });
         await d.line("r-hate-g");
         await d.line("r-hate-t", { mood: "angry" });
-        c.react("grace", { face: "😳" });
-        // The first crack in Trip's story.
-        await d.line("r-hate-g2", { look: "trip" });
-        c.react("trip", { face: "😳", mood: "fear" });
+        c.react("nina", { face: "😳" });
+        // The first crack in Theo's story.
+        await d.line("r-hate-g2", { look: "theo" });
+        c.react("theo", { face: "😳", mood: "fear" });
         d.s.knows.money = true;
-        d.shift({ grace: 0.8, trip: -0.5, tension: 2 });
+        d.shift({ nina: 0.8, theo: -0.5, tension: 2 });
       } else {
         await d.line("r-meh-t");
         await d.line("r-meh-g", { mood: "sad" });
       }
-      c.look("grace", "guest");
-      c.look("trip", "guest");
+      c.look("nina", "guest");
+      c.look("theo", "guest");
     },
   },
   {
@@ -1203,13 +1208,13 @@ const MIDDLE: BeatDef[] = [
     band: [2, 7],
     async run(d) {
       const c = d.cast;
-      c.look("trip", "guest");
+      c.look("theo", "guest");
       await d.line("w-t1", { mood: "happy" });
-      c.react("grace", { face: "😳" });
-      await d.line("w-g1", { look: "trip" });
+      c.react("nina", { face: "😳" });
+      await d.line("w-g1", { look: "theo" });
       await d.line("w-t2", { gesture: "handup" });
       await d.line("w-g2", { look: "guest" });
-      await d.line("w-t3", { mood: "love", look: "grace" });
+      await d.line("w-t3", { mood: "love", look: "nina" });
       await d.line("w-g3", { look: "guest" });
       const asking = "Romantic, or what?";
       await d.line("w-t4", { mood: "happy", look: "guest" });
@@ -1217,16 +1222,16 @@ const MIDDLE: BeatDef[] = [
       const r = await d.readMove(m, asking);
       if (r && (r.act === "flirt" || r.act === "insult")) await d.answer(r);
       if (r && (r.act === "agree" || r.act === "praise")) {
-        c.react("trip", { mood: "happy", face: "😄" });
+        c.react("theo", { mood: "happy", face: "😄" });
         await d.line("w-yes-t");
         await d.line("w-yes-g");
-        d.shift({ trip: 1, grace: -0.5, tension: 1 });
+        d.shift({ theo: 1, nina: -0.5, tension: 1 });
       } else if (r && (r.act === "disagree" || r.act === "criticize")) {
-        c.react("grace", { mood: "happy", face: "😄" });
+        c.react("nina", { mood: "happy", face: "😄" });
         await d.line("w-no-g");
-        c.react("trip", { mood: "angry", face: "😠" });
+        c.react("theo", { mood: "angry", face: "😠" });
         await d.line("w-no-t");
-        d.shift({ grace: 1, trip: -1, tension: 2 });
+        d.shift({ nina: 1, theo: -1, tension: 2 });
       } else d.shift({ tension: 1 });
     },
   },
@@ -1243,7 +1248,7 @@ export const ENDINGS: Record<Ending, { title: string; line: string }> = {
   },
   fracture: {
     title: "Fracture",
-    line: "Grace took the suitcase. Trip poured two drinks.",
+    line: "Nina took the suitcase. Theo poured two drinks.",
   },
   caught: { title: "Caught", line: "For once, they agreed on something: you." },
   out: {

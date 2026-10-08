@@ -18,7 +18,7 @@ import {
   type ScriptLine,
 } from "@/content/dinner-party-script";
 import { buildSet, type BuiltSet, type PropId } from "./set";
-import { Actor } from "./actor";
+import { Actor, angleDiff } from "./actor";
 import { Guest } from "./guest";
 import { read } from "./read";
 import type {
@@ -129,13 +129,21 @@ export class Stage implements Cast {
   private speaking: Who | null = null;
   private ray = new THREE.Raycaster();
   private picks: THREE.Object3D[] = [];
+  private solid: THREE.Object3D[] = [];
   private focus: { id: string; actions: Action[] } | null = null;
   private inSpot: Spot | null = null;
   private closeTo = new Set<Who>();
   private awayFor = 0;
   private grip = new THREE.Group();
   private buzzing = false;
+  private giving: Who | null = null;
   private homes = new Map<PropId, THREE.Matrix4>();
+  private tweens: {
+    t: number;
+    ms: number;
+    fn: (k: number) => void;
+    done: () => void;
+  }[] = [];
   playing = false;
 
   constructor(
@@ -173,6 +181,9 @@ export class Stage implements Cast {
     this.scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
     this.scene.environmentIntensity = 0.25;
     this.set = buildSet(this.scene, this.base);
+    this.scene.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) this.solid.push(o);
+    });
     for (const [id, o] of Object.entries(this.set.props) as [
       PropId,
       THREE.Object3D,
@@ -190,11 +201,11 @@ export class Stage implements Cast {
       Who,
       { url: string; body: "M" | "F"; at: [number, number] }
     > = {
-      trip: { url: "avatars/trip.glb", body: "M", at: MARKS.door },
-      grace: { url: "avatars/grace.glb", body: "F", at: [2.2, -0.6] },
+      theo: { url: "avatars/theo.glb", body: "M", at: MARKS.door },
+      nina: { url: "avatars/nina.glb", body: "F", at: [2.2, -0.6] },
     };
     await Promise.all(
-      (["trip", "grace"] as Who[]).map(async (who) => {
+      (["theo", "nina"] as Who[]).map(async (who) => {
         const a = start[who];
         const head = new TalkingHead(hidden, {
           avatarOnly: true,
@@ -231,6 +242,7 @@ export class Stage implements Cast {
         body.userData.who = who;
         arm.add(body);
         this.picks.push(body);
+        this.solid.push(body);
         this.scene.add(arm);
         this.heads[who] = head;
         const actor = new Actor(head);
@@ -255,8 +267,8 @@ export class Stage implements Cast {
       void this.take(id);
     for (const s of ["knock", "door-open", "room"]) void this.sound(s);
     if (this.name) {
-      void this.nameTake("TRIP", "exclaim");
-      void this.nameTake("GRACE", "address");
+      void this.nameTake("THEO", "exclaim");
+      void this.nameTake("NINA", "address");
     }
     await Promise.all(["d-g1", "d-t1"].map((id) => this.take(id as LineId)));
     tick();
@@ -320,11 +332,20 @@ export class Stage implements Cast {
     if (this.stopped) return;
     this.timer.update();
     const dt = Math.min(this.timer.getDelta(), 0.1);
-    for (const w of ["trip", "grace"] as Who[]) {
+    for (const w of ["theo", "nina"] as Who[]) {
       this.heads[w].animate(dt * 1000);
       this.actors[w].update(dt);
     }
-    const people = (["trip", "grace"] as Who[]).map((w) => this.actors[w].pos);
+    const people = (["theo", "nina"] as Who[]).map((w) => this.actors[w].pos);
+    for (const tw of [...this.tweens]) {
+      tw.t += dt * 1000;
+      const k = Math.min(1, tw.t / tw.ms);
+      tw.fn(k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2);
+      if (k >= 1) {
+        this.tweens.splice(this.tweens.indexOf(tw), 1);
+        tw.done();
+      }
+    }
     this.guestBody.update(dt, this.set.blocks, people);
     if (this.playing) this.sense(dt);
     this.aim();
@@ -348,7 +369,7 @@ export class Stage implements Cast {
       if (g.distanceTo(new THREE.Vector2(x, z)) < r) at = s;
     if (at && at !== this.inSpot) this.ev.onMove({ kind: "near", spot: at });
     this.inSpot = at;
-    for (const w of ["trip", "grace"] as Who[]) {
+    for (const w of ["theo", "nina"] as Who[]) {
       const d = g.distanceTo(this.actors[w].pos);
       if (d < 0.6 && !this.closeTo.has(w) && !this.actors[w].walking) {
         this.closeTo.add(w);
@@ -376,7 +397,7 @@ export class Stage implements Cast {
     if (o) id = o.userData.prop ?? o.userData.who;
     const actions: Action[] = [];
     const held = this.held;
-    if (id === "trip" || id === "grace") {
+    if (id === "theo" || id === "nina") {
       const who = id as Who;
       if (hit!.distance < 1.6) {
         actions.push({ key: "e", label: "Hug", move: { kind: "hug", who } });
@@ -442,24 +463,143 @@ export class Stage implements Cast {
     if (key === old) return;
     this.focus = f;
     const label =
-      f?.id === "trip"
-        ? "Trip"
-        : f?.id === "grace"
-          ? "Grace"
+      f?.id === "theo"
+        ? "Theo"
+        : f?.id === "nina"
+          ? "Nina"
           : f?.id === "held"
             ? "In your hand"
             : "";
     this.ev.onFocus(f ? { label, actions: f.actions } : null);
   }
 
-  /** Does what the guest asked by key or button. */
+  /** Eases fn from 0 to 1 over ms, in step with the frame. */
+  private tween(ms: number, fn: (k: number) => void) {
+    return new Promise<void>((done) =>
+      this.tweens.push({ t: 0, ms, fn, done }),
+    );
+  }
+
+  /** Does what the guest asked by key or button, and plays it out. */
   act(a: Action) {
     const m = a.move;
     if (m === "pickup") return;
-    if (m.kind === "sit") {
-      this.guestBody.sit(3.0, -1.75, 0);
+    if (this.guestBody.busy) return;
+    switch (m.kind) {
+      case "sit":
+        void this.sitDown();
+        break;
+      case "hug":
+        void this.hug(m.who);
+        break;
+      case "kiss":
+        void this.kiss(m.who);
+        break;
+      case "sip":
+        void this.sip();
+        break;
+      case "give":
+        this.giving = m.who;
+        break;
+      case "drop":
+        // Down it goes now, whatever anyone says about it after.
+        for (const c of [...this.grip.children]) void this.letGo(c, null);
+        break;
+      case "take":
+        if (m.prop === "painting" || m.prop === "suitcase")
+          void this.closeIn(
+            this.set.props[m.prop].getWorldPosition(new THREE.Vector3()),
+            m.prop === "painting" ? 0.9 : 0.7,
+            1600,
+          );
+        break;
     }
     this.ev.onMove(m);
+  }
+
+  /**
+   * Moves the guest's head toward a point (stopping gap metres short), holds,
+   * and comes back. Feet stay put, so nothing can end up inside a wall.
+   */
+  private async closeIn(
+    at: THREE.Vector3,
+    gap: number,
+    hold: number,
+    during?: () => Promise<void> | void,
+  ) {
+    const g = this.guestBody;
+    g.busy = true;
+    g.goal = null;
+    g.gaze = at;
+    const eye = g.camera.position.clone().sub(g.lean);
+    const to = at.clone().sub(eye);
+    const len = to.length();
+    const want = to.multiplyScalar(Math.max(0, (len - gap) / len));
+    // Never lean more than a long step.
+    if (want.length() > 0.9) want.setLength(0.9);
+    await this.tween(650, (k) => g.lean.copy(want).multiplyScalar(k));
+    await Promise.all([during?.(), this.wait(hold)]);
+    g.gaze = null;
+    await this.tween(700, (k) => g.lean.copy(want).multiplyScalar(1 - k));
+    g.lean.set(0, 0, 0);
+    g.busy = false;
+  }
+
+  private async hug(who: Who) {
+    const a = this.actors[who];
+    a.facing = this.guestBody.camera;
+    const chest = this.headOf(who)
+      .getWorldPosition(new THREE.Vector3())
+      .add(new THREE.Vector3(0, -0.2, 0));
+    void this.tween(700, (k) => (a.reach = k));
+    await this.closeIn(chest, 0.34, 1500);
+    await this.tween(600, (k) => (a.reach = 1 - k));
+  }
+
+  private async kiss(who: Who) {
+    const face = this.headOf(who).getWorldPosition(new THREE.Vector3());
+    face.y += 0.04;
+    await this.closeIn(face, 0.16, 700, async () => {
+      await this.tween(250, (k) => this.uniform("fade", 0.45 * k));
+      await this.wait(300);
+      await this.tween(350, (k) => this.uniform("fade", 0.45 * (1 - k)));
+    });
+  }
+
+  /** Raises the glass to the lips and back. */
+  private async sip() {
+    const o = this.grip.children[0];
+    if (!o) return;
+    const g = this.guestBody;
+    g.busy = true;
+    const from = o.position.clone();
+    const to = new THREE.Vector3(0.03, -0.1, -0.2);
+    await this.tween(550, (k) => {
+      o.position.lerpVectors(from, to, k);
+      o.rotation.x = 0.6 * k;
+      g.pitch += (0.12 - g.pitch) * k * 0.08;
+    });
+    await this.wait(600);
+    await this.tween(550, (k) => {
+      o.position.lerpVectors(to, from, k);
+      o.rotation.x = 0.6 * (1 - k);
+    });
+    g.busy = false;
+  }
+
+  /** Walks the last bit to the sofa and lowers into it. */
+  private async sitDown() {
+    const g = this.guestBody;
+    g.busy = true;
+    const from = g.pos.clone();
+    const to = new THREE.Vector2(3.0, -1.75);
+    const yaw0 = g.yaw;
+    await this.tween(900, (k) => {
+      g.pos.lerpVectors(from, to, k);
+      g.yaw = yaw0 + angleDiff(0, yaw0) * k;
+    });
+    g.sit(to.x, to.y, 0);
+    g.busy = false;
   }
 
   /** A click: on something you can use, use it; on the floor, walk there. */
@@ -472,10 +612,8 @@ export class Stage implements Cast {
       return this.act(this.focus.actions[0]);
     const floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
     const p = this.ray.ray.intersectPlane(floor, new THREE.Vector3());
-    if (p && p.distanceTo(this.guestBody.camera.position) < 12) {
-      if (this.guestBody.sitting) this.guestBody.stand();
-      this.guestBody.goal = new THREE.Vector2(p.x, p.z);
-    }
+    if (p && p.distanceTo(this.guestBody.camera.position) < 12)
+      this.guestBody.go(p.x, p.z);
   }
 
   private focusDistance() {
@@ -487,11 +625,11 @@ export class Stage implements Cast {
       const to = h.clone().sub(c.position);
       if (to.clone().normalize().dot(fwd) > 0.8) return to.length();
     }
+    // Only the set and the actors' stand-in columns: raycasting the skinned
+    // avatars every frame is what made walking stutter.
     this.ray.setFromCamera(new THREE.Vector2(0, 0), c);
     this.ray.far = 12;
-    const hit = this.ray
-      .intersectObjects(this.scene.children, true)
-      .find((h) => (h.object as THREE.Mesh).isMesh);
+    const hit = this.ray.intersectObjects(this.solid, false)[0];
     return hit ? hit.distance : 3;
   }
 
@@ -529,7 +667,7 @@ export class Stage implements Cast {
     return p;
   }
 
-  private nameTake(who: "TRIP" | "GRACE", tone: "exclaim" | "address") {
+  private nameTake(who: "THEO" | "NINA", tone: "exclaim" | "address") {
     const key = `name:${who}:${tone}`;
     let p = this.takes.get(key);
     if (!p) {
@@ -637,7 +775,7 @@ export class Stage implements Cast {
     },
   ) {
     const l = SCRIPT[id];
-    const who: Who = l.who === "TRIP" ? "trip" : "grace";
+    const who: Who = l.who === "THEO" ? "theo" : "nina";
     const head = this.heads[who];
     this.prefetch(id);
     const { take, text } = await this.compose(id);
@@ -666,7 +804,7 @@ export class Stage implements Cast {
   /** A line heard through the front door: muffled, nobody on screen. */
   async door(id: LineId) {
     const l = SCRIPT[id];
-    const who: Who = l.who === "TRIP" ? "trip" : "grace";
+    const who: Who = l.who === "THEO" ? "theo" : "nina";
     this.prefetch(id);
     const t = await this.take(id);
     this.ev.onSubtitle(who, l.text, true);
@@ -691,7 +829,9 @@ export class Stage implements Cast {
       const src = this.ctx.createBufferSource();
       src.buffer = t.buf;
       const g = this.ctx.createGain();
-      g.gain.value = id === "room" ? 0.25 : 0.8;
+      // The generated effects come back at wildly different levels, so set
+      // each by its measured loudness rather than trusting the file.
+      g.gain.value = Math.min(3, (LOUDNESS[id] ?? 0.04) / rms(t.buf));
       src.loop = id === "room";
       src.connect(g).connect(this.ctx.destination);
       src.start();
@@ -715,8 +855,8 @@ export class Stage implements Cast {
     switch (at) {
       case "guest":
         return this.guestBody.camera;
-      case "trip":
-      case "grace":
+      case "theo":
+      case "nina":
         return this.headOf(at);
       case "closet":
         return this.set.props.suitcase;
@@ -732,28 +872,25 @@ export class Stage implements Cast {
 
   /** Puts something in the guest's hand (or empties it). */
   hand(held: Held) {
-    // Whatever was held goes back where it came from.
-    for (const c of [...this.grip.children]) {
-      this.grip.remove(c);
-      const home = c.userData.home as PropId | undefined;
-      if (home) {
-        const p = this.set.props[home];
-        p.matrix.copy(this.homes.get(home)!);
-        p.matrix.decompose(p.position, p.quaternion, p.scale);
-        p.visible = true;
-      }
-    }
+    // Whatever was held goes back where it came from, or to whoever it
+    // was handed to.
+    const to = this.giving;
+    this.giving = null;
+    for (const c of [...this.grip.children]) void this.letGo(c, to);
     this.held = held;
     if (!held) return this.ev.onReveal(null);
     let o: THREE.Object3D;
     const glass = () => {
       const g = new THREE.Mesh(
         new THREE.CylinderGeometry(0.035, 0.03, 0.09, 20),
-        new THREE.MeshPhysicalMaterial({
+        // Plain transparency: a transmissive glass this close to the lens
+        // costs a second render of the room every frame.
+        new THREE.MeshStandardMaterial({
           color: 0xd9a35b,
-          roughness: 0.05,
-          transmission: 0.6,
-          thickness: 0.04,
+          roughness: 0.1,
+          metalness: 0.1,
+          transparent: true,
+          opacity: 0.75,
         }),
       );
       return g;
@@ -772,8 +909,57 @@ export class Stage implements Cast {
       src.visible = false;
       o.userData.home = id;
     }
-    o.position.add(new THREE.Vector3(0.16, -0.17, -0.42));
+    // It comes up into view from wherever it was: the prop's place in the
+    // room, or Theo's hand for a drink.
+    const rest = o.position.clone().add(new THREE.Vector3(0.16, -0.17, -0.42));
+    const src =
+      held === "drink"
+        ? this.headOf("theo")
+            .getWorldPosition(new THREE.Vector3())
+            .add(new THREE.Vector3(0, -0.45, 0))
+        : held === "bottle"
+          ? this.set.props.bottles.getWorldPosition(new THREE.Vector3())
+          : this.set.props[o.userData.home as PropId].getWorldPosition(
+              new THREE.Vector3(),
+            );
+    this.guestBody.camera.updateMatrixWorld();
+    const start = this.grip.worldToLocal(src);
+    if (start.length() > 2.5) start.setLength(2.5);
+    o.position.copy(start);
     this.grip.add(o);
+    if (held === "drink") {
+      const t = this.actors.theo;
+      t.take = 1;
+      void this.wait(500).then(() => this.tween(500, (k) => (t.take = 1 - k)));
+    }
+    void this.tween(600, (k) => o.position.lerpVectors(start, rest, k));
+  }
+
+  /** Lowers a held thing out of view, then puts it back (or hands it over). */
+  private async letGo(o: THREE.Object3D, to: Who | null) {
+    const from = o.position.clone();
+    let end = from.clone().add(new THREE.Vector3(0, -0.35, 0.1));
+    if (to) {
+      const a = this.actors[to];
+      a.take = 1;
+      const w = this.headOf(to)
+        .getWorldPosition(new THREE.Vector3())
+        .add(new THREE.Vector3(0, -0.45, 0));
+      end = this.grip.worldToLocal(w);
+      if (end.length() > 1.5) end.setLength(1.5);
+    }
+    await this.tween(to ? 600 : 400, (k) =>
+      o.position.lerpVectors(from, end, k),
+    );
+    this.grip.remove(o);
+    if (to) void this.tween(500, (k) => (this.actors[to].take = 1 - k));
+    const home = o.userData.home as PropId | undefined;
+    if (home) {
+      const p = this.set.props[home];
+      p.matrix.copy(this.homes.get(home)!);
+      p.matrix.decompose(p.position, p.quaternion, p.scale);
+      p.visible = true;
+    }
   }
 
   buzz(on: boolean) {
@@ -791,8 +977,8 @@ export class Stage implements Cast {
     const g = this.guestBody.pos;
     return {
       dist: {
-        trip: g.distanceTo(this.actors.trip.pos),
-        grace: g.distanceTo(this.actors.grace.pos),
+        theo: g.distanceTo(this.actors.theo.pos),
+        nina: g.distanceTo(this.actors.nina.pos),
       },
       at: this.inSpot,
       held: this.held,
@@ -830,5 +1016,23 @@ export class Stage implements Cast {
   }
 }
 
+/** How loud each effect should sit in the mix, as RMS. */
+const LOUDNESS: Record<string, number> = {
+  room: 0.01,
+  buzz: 0.025,
+  knock: 0.07,
+  "door-open": 0.05,
+  "door-shut": 0.06,
+  pour: 0.035,
+  clink: 0.03,
+};
+
+function rms(b: AudioBuffer) {
+  const d = b.getChannelData(0);
+  let sum = 0;
+  for (let i = 0; i < d.length; i += 4) sum += d[i] * d[i];
+  return Math.max(1e-4, Math.sqrt(sum / (d.length / 4)));
+}
+
 const people = (s: Stage) =>
-  (["trip", "grace"] as Who[]).map((w) => s.actors[w].pos);
+  (["theo", "nina"] as Who[]).map((w) => s.actors[w].pos);

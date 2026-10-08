@@ -21,6 +21,13 @@ export class Guest {
   /** Set when the guest walks somewhere by clicking. */
   goal: THREE.Vector2 | null = null;
   frozen = true;
+  /** Set while the body is doing something (a hug, a sip): no walking. */
+  busy = false;
+  /** Where the head has moved to for an action, added to the eye. */
+  lean = new THREE.Vector3();
+  /** A point the view is held on during an action. */
+  gaze: THREE.Vector3 | null = null;
+  private goalTime = 0;
   private keys = new Set<string>();
   private bob = 0;
   private eye = EYE;
@@ -115,6 +122,13 @@ export class Guest {
     this.yaw = yaw;
   }
 
+  /** Walks to a point on the floor. */
+  go(x: number, z: number) {
+    if (this.sitting) this.stand();
+    this.goal = new THREE.Vector2(x, z);
+    this.goalTime = 0;
+  }
+
   stand() {
     this.sitting = false;
     this.pos.y += 0.6; // step forward off the sofa
@@ -134,7 +148,7 @@ export class Guest {
     blocks: [number, number, number, number][],
     people: THREE.Vector2[],
   ) {
-    if (!this.frozen && !this.sitting) {
+    if (!this.frozen && !this.sitting && !this.busy) {
       const f = new THREE.Vector2(-Math.sin(this.yaw), -Math.cos(this.yaw));
       const r = new THREE.Vector2(-f.y, f.x);
       const v = new THREE.Vector2();
@@ -147,7 +161,10 @@ export class Guest {
       if (k.has("arrowright")) this.yaw -= 1.8 * dt;
       if (this.goal) {
         const d = this.goal.clone().sub(this.pos);
-        if (d.length() < 0.08) this.goal = null;
+        this.goalTime += dt;
+        // Never walk at a click for longer than it should take.
+        if (d.length() < 0.08 || this.goalTime > 1.5 + d.length() / SPEED)
+          this.goal = null;
         else {
           v.copy(d.normalize());
           // Ease the view round toward where you're heading.
@@ -163,8 +180,14 @@ export class Guest {
         this.pos.add(v.normalize().multiplyScalar(SPEED * dt));
         this.collide(blocks, people);
         this.bob += before.distanceTo(this.pos) * 9;
-        // Walked into something: give up on the click target.
-        if (this.goal && before.distanceTo(this.pos) < SPEED * dt * 0.2)
+        // Walked into something, or sliding round someone without getting
+        // closer: give up on the click target.
+        if (
+          this.goal &&
+          (before.distanceTo(this.pos) < SPEED * dt * 0.2 ||
+            this.goal.distanceTo(this.pos) >
+              this.goal.distanceTo(before) - SPEED * dt * 0.1)
+        )
           this.goal = null;
       }
     }
@@ -176,6 +199,18 @@ export class Guest {
       this.eye + Math.sin(this.bob) * 0.012,
       this.pos.y,
     );
+    c.position.add(this.lean);
+    if (this.gaze) {
+      const d = this.gaze.clone().sub(c.position);
+      const yaw = Math.atan2(-d.x, -d.z);
+      const pitch = Math.atan2(d.y, Math.hypot(d.x, d.z));
+      let dy = yaw - this.yaw;
+      while (dy > Math.PI) dy -= Math.PI * 2;
+      while (dy < -Math.PI) dy += Math.PI * 2;
+      const k = Math.min(1, dt * 5);
+      this.yaw += dy * k;
+      this.pitch += (pitch - this.pitch) * k;
+    }
     c.rotation.set(this.pitch, this.yaw, 0, "YXZ");
   }
 

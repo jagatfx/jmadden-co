@@ -19,11 +19,11 @@ type Phase = "name" | "loading" | "door" | "play" | "end";
 const NOTES = {
   phone: {
     from: "Dan Reyes",
-    text: "Margin call on the options account came in. We need to talk tonight, Trip. Please call me back.",
+    text: "Margin call on the options account came in. We need to talk tonight, Theo. Please call me back.",
   },
   letter: {
     from: "Casa Azul Residency, Lisbon",
-    text: "Dear Grace, we are delighted to confirm your place for the coming year. Your studio will be ready on the 1st. We look forward to welcoming you.",
+    text: "Dear Nina, we are delighted to confirm your place for the coming year. Your studio will be ready on the 1st. We look forward to welcoming you.",
   },
 };
 
@@ -34,6 +34,10 @@ export function DinnerPartyStage() {
   const field = useRef<HTMLInputElement>(null);
   const mic = useRef<AbortController | null>(null);
   const subRef = useRef("");
+  /** The last few lines spoken, so the mic can tell their echo from you. */
+  const recent = useRef<string[]>([]);
+  /** Called when someone starts talking, to cut the mic off mid-listen. */
+  const hush = useRef<(() => void) | null>(null);
   const [phase, setPhase] = useState<Phase>("name");
   const [name, setName] = useState("");
   const [progress, setProgress] = useState(0);
@@ -95,6 +99,10 @@ export function DinnerPartyStage() {
     const s = new Stage(host.current!, BASE, guestName, {
       onSubtitle: (who, text, door) => {
         subRef.current = text;
+        if (text) {
+          recent.current = [text, ...recent.current].slice(0, 6);
+          hush.current?.();
+        }
         setSub({ who, text, door });
       },
       onProgress: setProgress,
@@ -106,6 +114,9 @@ export function DinnerPartyStage() {
       },
     });
     stage.current = s;
+    // A handle for poking at the scene from the console.
+    if (new URLSearchParams(location.search).has("debug"))
+      (window as unknown as { __dp: Stage }).__dp = s;
     await s.load();
     await s.unlock();
     const d = new Drama(s, {
@@ -153,15 +164,37 @@ export function DinnerPartyStage() {
     mic.current = ac;
     setListening(true);
     while (!ac.signal.aborted) {
+      // The mic hears the speakers too, so it only listens while nobody
+      // in the room is talking, and stops the moment someone starts.
+      while (subRef.current && !ac.signal.aborted)
+        await new Promise((r) => setTimeout(r, 150));
+      await new Promise((r) => setTimeout(r, 350));
+      if (subRef.current) continue;
+      const turn = new AbortController();
+      const stop = () => turn.abort();
+      ac.signal.addEventListener("abort", stop);
+      hush.current = stop;
       const said = await listen({
         patience: 30,
         settle: 1.1,
         onHeard: (h) => setDraft(h.text),
         onDeaf: () => ac.abort(),
-        signal: ac.signal,
+        signal: turn.signal,
         typed: new Promise(() => {}),
       });
-      if (said && !echo(said, subRef.current)) say(said);
+      hush.current = null;
+      ac.signal.removeEventListener("abort", stop);
+      if (
+        said &&
+        !turn.signal.aborted &&
+        // A tail of a line caught before the mic shut: only longer
+        // phrases can be told apart from a real answer this way.
+        !(
+          said.split(/\s+/).length >= 3 &&
+          recent.current.some((line) => echo(said, line))
+        )
+      )
+        say(said);
       else setDraft("");
     }
     setListening(false);
@@ -177,7 +210,7 @@ export function DinnerPartyStage() {
         {phase === "name" || phase === "loading" ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-black px-6 text-center text-white">
             <p className="font-mono text-xs tracking-[0.3em] uppercase opacity-60">
-              An evening with Trip and Grace
+              An evening with Theo and Nina
             </p>
             <h2 className="font-display text-5xl sm:text-7xl">Dinner Party</h2>
             {phase === "name" ? (
@@ -301,8 +334,8 @@ export function DinnerPartyStage() {
             <p className="max-w-md opacity-80">{ENDINGS[ending].line}</p>
             {state ? (
               <p className="font-mono text-xs opacity-50">
-                {state.beats.length} scenes · Trip {fmt(state.trust.trip)} ·
-                Grace {fmt(state.trust.grace)} · tension{" "}
+                {state.beats.length} scenes · Theo {fmt(state.trust.theo)} ·
+                Nina {fmt(state.trust.nina)} · tension{" "}
                 {Math.round(state.tension)}/10
               </p>
             ) : null}
@@ -357,9 +390,9 @@ export function DinnerPartyStage() {
       ) : null}
       {debug && state ? (
         <p className="mt-2 font-mono text-[11px] opacity-60">
-          beat {state.beat} · trip {fmt(state.trust.trip)} · grace{" "}
-          {fmt(state.trust.grace)} · tension {state.tension.toFixed(1)} ·
-          strikes {state.strikes} · flirts {state.flirts} · heard: {heard}
+          beat {state.beat} · theo {fmt(state.trust.theo)} · nina{" "}
+          {fmt(state.trust.nina)} · tension {state.tension.toFixed(1)} · strikes{" "}
+          {state.strikes} · flirts {state.flirts} · heard: {heard}
         </p>
       ) : null}
     </div>

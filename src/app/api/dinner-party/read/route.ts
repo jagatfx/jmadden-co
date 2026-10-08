@@ -18,20 +18,20 @@ const Reading = z.object({
 const Body = z.object({
   said: z.string().min(1).max(400),
   beat: z.string().max(40),
-  lastSpeaker: z.enum(["trip", "grace"]).nullable(),
+  lastSpeaker: z.enum(["theo", "nina"]).nullable(),
   lastLine: z.string().max(400),
   asking: z.string().max(400).optional(),
 });
 
-const SYSTEM = `You read one line said by the guest in an interactive drama, the way Façade's parser did. Trip and Grace, a married couple in their late thirties, have their oldest friend (the guest) over for drinks. They are fighting under the surface. Trip secretly lost $80,000 on options trades (their advisor Dan keeps calling). Grace secretly accepted a year-long painting residency in Lisbon; her bag is packed.
+const SYSTEM = `You read one line said by the guest in an interactive drama, the way Façade's parser did. Theo and Nina, a married couple in their late thirties, have their oldest friend (the guest) over for drinks. They are fighting under the surface. Theo secretly lost $80,000 on options trades (their advisor Dan keeps calling). Nina secretly accepted a year-long painting residency in Lisbon; her bag is packed.
 
 Return the guest's move:
 - act: agree, disagree, praise, criticize, flirt, insult, eject, question, greet, thank, sorry, calm (telling them to stop fighting or relax), leave (saying goodbye or that they're going), or neutral.
   - eject is only for slurs, threats, sexual remarks about either of them, or urging one of them to cheat.
   - insult is rudeness aimed at a person ("shut up", "you're pathetic"). Criticizing a thing or a choice is criticize.
-  - flirt is romantic or physical interest in Trip or Grace, not praise of a thing.
+  - flirt is romantic or physical interest in Theo or Nina, not praise of a thing.
   - A plain yes or no to the question on the table is agree or disagree.
-- target: whose side the move lands on or who it's aimed at: trip, grace, both, or none. Siding with one of them against the other targets the one being sided with for agree/praise, and the one being attacked for criticize/insult.
+- target: whose side the move lands on or who it's aimed at: theo, nina, both, or none. Siding with one of them against the other targets the one being sided with for agree/praise, and the one being attacked for criticize/insult.
 - topics: any of the night's sore points the line touches.`;
 
 const client = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;

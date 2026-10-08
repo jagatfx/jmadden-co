@@ -171,7 +171,7 @@ export async function GET(
   } else if (kind === "name") {
     const [who, tone, name] = rest;
     if (
-      (who !== "TRIP" && who !== "GRACE") ||
+      (who !== "THEO" && who !== "NINA") ||
       (tone !== "exclaim" && tone !== "address") ||
       !name
     )

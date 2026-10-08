@@ -4,7 +4,7 @@ import { DinnerPartyStage } from "@/components/dinner-party/stage";
 export const metadata: Metadata = {
   title: "Dinner Party",
   description:
-    "Drinks at Trip and Grace's. Walk their loft, say anything, and see where the night goes.",
+    "Drinks at Theo and Nina's. Walk their loft, say anything, and see where the night goes.",
   robots: { index: false, follow: false },
 };
 
