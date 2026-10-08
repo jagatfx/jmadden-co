@@ -76,7 +76,15 @@ const MARKS: Record<Mark, [number, number]> = {
   "sofa-side": [1.0, -1.15],
   table: [1.4, -1.3],
   window: [-1.0, -1.9],
+  kitchen: [7.5, 0.2],
 };
+
+/** Walks between rooms go through the opening and round the island. */
+const THROUGH: [number, number][] = [
+  [4.3, 1.3],
+  [5.6, 1.3],
+  [6.0, 0.2],
+];
 
 /** Places in the room that mean something when the guest walks up. */
 const SPOTS: Record<Spot, [number, number, number]> = {
@@ -86,6 +94,7 @@ const SPOTS: Record<Spot, [number, number, number]> = {
   sideboard: [-4.2, -0.4, 1.0],
   bar: [-2.5, -1.1, 0.9],
   sofa: [3.0, -1.3, 0.6],
+  kitchen: [6.8, 1.3, 1.75],
 };
 
 export type Action = { key: string; label: string; move: Move | "pickup" };
@@ -867,7 +876,16 @@ export class Stage implements Cast {
 
   async walk(who: Who, to: Mark) {
     const [x, z] = MARKS[to];
-    await this.actors[who].walk([x, z]);
+    const a = this.actors[who];
+    const inside = (px: number) => px > 5;
+    // Through the opening, not the wall.
+    const via =
+      inside(a.pos.x) === inside(x)
+        ? []
+        : inside(x)
+          ? THROUGH
+          : [...THROUGH].reverse();
+    await a.walk(...via, [x, z]);
   }
 
   /** Puts something in the guest's hand (or empties it). */

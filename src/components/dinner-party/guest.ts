@@ -10,7 +10,8 @@ const EYE = 1.62;
 const SEATED = 1.12;
 const SPEED = 1.35;
 const RADIUS = 0.25;
-const ROOM = { x0: -4.65, x1: 4.65, z0: -2.3, z1: 4.15 };
+// The living room plus the kitchen off it; walls between are blocks.
+const ROOM = { x0: -4.65, x1: 8.35, z0: -2.3, z1: 4.15 };
 
 export class Guest {
   camera: THREE.PerspectiveCamera;

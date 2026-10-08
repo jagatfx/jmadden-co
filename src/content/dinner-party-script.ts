@@ -719,6 +719,97 @@ export const SCRIPT = {
     ),
   ),
   "e-left-door-t": door(T("What I did?!", "[shouting, muffled] What I did?!")),
+
+  // The kitchen: one of them slips out, and the guest can follow
+  "c-t-exit": T(
+    "I'm getting more ice.",
+    "[clipped, already walking] I'm getting more ice.",
+  ),
+  "c-g-exit": G(
+    "I'll get the olives.",
+    "[tight, forced brightness] I'll get the olives.",
+  ),
+  "c-t-left": T(
+    "There are no olives. There have never been olives.",
+    "[dry, under his breath] There are no olives. There have never been olives.",
+  ),
+  "c-g-left": G(
+    "He doesn't need more ice.",
+    "[quiet, pointed] He doesn't need more ice.",
+  ),
+  "c-t1": T(
+    "Hey. Okay. I need you to do something for me tonight.",
+    "[low, relieved you came] Hey. Okay. I need you to do something for me tonight.",
+    "address",
+  ),
+  "c-t2": T(
+    "If money comes up, change the subject. Please. I'm handling it.",
+    "[hushed, urgent] If money comes up, change the subject. Please. I'm handling it.",
+  ),
+  "c-t3": T("Are you with me?", "[searching your face] Are you with me?"),
+  "c-t-yes": T(
+    "Thank you. I knew I could count on you.",
+    "[relieved, squeezing out a smile] Thank you. I knew I could count on you.",
+  ),
+  "c-t-no": T(
+    "Right. Of course. Forget I asked.",
+    "[stung, closing off] Right. Of course. Forget I asked.",
+  ),
+  "c-g1": G(
+    "I'm glad you came in. I can't say this out there.",
+    "[quiet, glancing at the doorway] I'm glad you came in. I can't say this out there.",
+    "address",
+  ),
+  "c-g2": G(
+    "I might be going away for a while. A long while. He doesn't know.",
+    "[barely above a whisper, shaky] I might be going away for a while. A long while. He doesn't know.",
+  ),
+  "c-g3": G(
+    "Would you think less of me?",
+    "[vulnerable] Would you think less of me?",
+  ),
+  "c-g-yes": G(
+    "Thank you. You have no idea what that means.",
+    "[moved, almost a whisper] Thank you. You have no idea what that means.",
+  ),
+  "c-g-no": G(
+    "No. You're right. I know. I know.",
+    "[deflated, eyes down] No. You're right. I know. I know.",
+  ),
+  "c-t-call": T(
+    "What are you two whispering about in there?",
+    "[calling out, suspicious, too loud] What are you two whispering about in there?",
+  ),
+  "c-g-call": G(
+    "Everything okay in there?",
+    "[calling out, a little too casual] Everything okay in there?",
+  ),
+  "c-t-alone": T(
+    "While she's in there. Does she seem happy to you?",
+    "[low and quick, glancing at the kitchen] While she's in there. Does she seem happy to you?",
+  ),
+  "c-g-alone": G(
+    "While he's gone. Has he said anything to you about money?",
+    "[low, glancing at the kitchen] While he's gone. Has he said anything to you about money?",
+  ),
+  "c-t-alone-r": T(
+    "Yeah. That's what I thought.",
+    "[quiet, hurt] Yeah. That's what I thought.",
+  ),
+  "c-g-alone-r": G(
+    "Okay. Thank you for being honest with me.",
+    "[quiet] Okay. Thank you for being honest with me.",
+  ),
+  "c-t-back": T("Ice!", "[too cheerful, rattling the glass] Ice!"),
+  "c-g-back": G("No olives. Sorry.", "[brittle smile] No olives. Sorry."),
+  "x-kitchen-g": G(
+    "Help yourself, there's wine in the fridge.",
+    "[calling over, warm] Help yourself, there's wine in the fridge.",
+  ),
+  "x-kitchen-t": T(
+    "Raiding the fridge already? Good.",
+    "[calling over, amused] Raiding the fridge already? Good.",
+  ),
 } satisfies Record<string, ScriptLine>;
 
 export type LineId = keyof typeof SCRIPT;

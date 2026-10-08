@@ -20,11 +20,12 @@ export type Mark =
   | "painting"
   | "sofa-side"
   | "table"
-  | "window";
+  | "window"
+  | "kitchen";
 export type Look =
   "guest" | Who | "painting" | "photo" | "phone" | "closet" | "door";
 export type Spot =
-  "door" | "closet" | "painting" | "sideboard" | "bar" | "sofa";
+  "door" | "closet" | "painting" | "sideboard" | "bar" | "sofa" | "kitchen";
 export type Held = "drink" | "photo" | "letter" | "phone" | "bottle" | null;
 export type Ending =
   "honest" | "recommit" | "fracture" | "caught" | "out" | "left";
@@ -146,6 +147,8 @@ export class Drama {
   private quiet = 0;
   private ended = false;
   private buzzes = 0;
+  /** Who's off in the kitchen for a private word, if anyone. */
+  private aside: Who | null = null;
 
   constructor(cast: Cast, ev: DramaEvents = {}) {
     this.cast = cast;
@@ -375,6 +378,13 @@ export class Drama {
         this.shift({ tension: 1 });
       }
     }
+    // Once a night, maybe, one of them needs a minute in the kitchen.
+    if (
+      this.s.beats.length >= 1 &&
+      Math.random() < 0.55 &&
+      this.fresh("kitchen")
+    )
+      await this.kitchen();
     // Theo's phone goes off now and then once the drinks are poured.
     if (!this.s.secrets.theo && this.buzzes < 3 && Math.random() < 0.55) {
       this.buzzes++;
@@ -391,6 +401,92 @@ export class Drama {
         this.shift({ tension: 1 });
       }
     }
+  }
+
+  /**
+   * One of them slips off to the kitchen. Follow, and they say in private
+   * what they can't out here; stay, and the other takes their chance.
+   */
+  private async kitchen() {
+    const who: Who = Math.random() < 0.5 ? "theo" : "nina";
+    const o = other(who);
+    const t = who === "theo";
+    this.aside = who;
+    try {
+      await this.line(t ? "c-t-exit" : "c-g-exit", { look: o });
+      const going = this.cast.walk(who, "kitchen");
+      this.cast.look(o, who);
+      await this.line(t ? "c-g-left" : "c-t-left", { look: "guest" });
+      const followed = await this.until(
+        () => this.cast.guest().at === "kitchen",
+        12000,
+      );
+      if (followed) {
+        await going;
+        this.cast.look(who, "guest");
+        await this.lines(
+          ...((t
+            ? ["c-t1", "c-t2", "c-t3"]
+            : ["c-g1", "c-g2", "c-g3"]) as LineId[]),
+        );
+        const r = await this.readMove(
+          await this.hold(
+            t ? "Are you with me?" : "Would you think less of me?",
+          ),
+        );
+        // "With me?" wants a yes; "think less of me?" wants a no.
+        const support =
+          !!r &&
+          (t
+            ? ["agree", "praise", "thank", "calm"]
+            : ["disagree", "praise", "calm", "thank", "sorry"]
+          ).includes(r.act);
+        if (support) {
+          await this.line(t ? "c-t-yes" : "c-g-yes", { mood: "happy" });
+          this.shift({ [who]: 1.5 });
+          if (t) this.s.knows.money = true;
+          else this.s.knows.lisbon = true;
+        } else {
+          await this.line(t ? "c-t-no" : "c-g-no", { mood: "sad" });
+          this.shift({ [who]: r ? -1 : -0.5 });
+        }
+        // The one left out there has noticed.
+        this.cast.look(o, who);
+        await this.line(t ? "c-g-call" : "c-t-call");
+        this.shift({ [o]: -0.5, tension: 1 });
+      } else {
+        this.cast.look(o, "guest");
+        await this.line(t ? "c-g-alone" : "c-t-alone");
+        const r = await this.readMove(
+          await this.hold(
+            t
+              ? "Has he said anything about money?"
+              : "Does she seem happy to you?",
+          ),
+        );
+        if (r) {
+          await this.line(t ? "c-g-alone-r" : "c-t-alone-r");
+          this.shift({ [o]: 0.5, tension: 0.5 });
+        }
+        await going;
+      }
+    } finally {
+      this.aside = null;
+    }
+    await this.cast.walk(who, t ? "center-t" : "center-g");
+    this.cast.look(who, "guest");
+    await this.line(t ? "c-t-back" : "c-g-back");
+  }
+
+  /** Handles the guest's moves until ok() holds or ms runs out. */
+  private async until(ok: () => boolean, ms: number) {
+    const end = performance.now() + ms;
+    while (performance.now() < end) {
+      if (ok()) return true;
+      await this.drain();
+      await this.cast.wait(250);
+    }
+    return ok();
   }
 
   /** Answers a silent hold. */
@@ -479,6 +575,11 @@ export class Drama {
         if (m.spot === "door" && this.fresh("x-leave-t")) {
           this.cast.react("theo", { face: "😳" });
           await this.line("x-leave-t");
+        }
+        if (m.spot === "kitchen" && !this.aside) {
+          const w: Who = g.dist.nina < g.dist.theo ? "nina" : "theo";
+          const id = w === "theo" ? "x-kitchen-t" : "x-kitchen-g";
+          if (this.fresh(id)) await this.line(id);
         }
         if (
           m.spot === "closet" &&
