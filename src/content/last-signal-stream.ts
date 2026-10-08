@@ -39,9 +39,7 @@ export const STREAM_IDS: Partial<Record<string, string>> = {
   "11A": "d9c5fb10c8de500e89de94b28b0441b6",
   "12A": "dac143ccc04333953886e6a2f3f86c1f",
   "13A": "87ebdbe8696ee4fe0deef4cd46fa03a1",
-  "11B": "7e67f0feede858cc5302282cec137f4f",
   "12B": "b36086290aa2dba98a5cdcfe4b95a082",
-  "13B": "c95add7dfe2a92b5383cb6b1388759cb",
   "01": "0839728511588f5cfa44f0a277c2c503",
   "08": "d032f43e131643aa72b17340ed9f3f18",
   "08s": "87a9f93aece68878ba5a48659f9ff908",
@@ -54,12 +52,14 @@ export const STREAM_IDS: Partial<Record<string, string>> = {
   H4: "14bcbcbcd43fca827885a4c95c47cbfd",
   H5: "65a117c79225b598186e12c92a52eb1d",
   S1: "eaf49cab2b1005998120f42d1f9c3cdd",
-  S3: "2e2b0631e82d8abfd2417796a6fec31d",
   S4: "e520f77d282118d0e686aa6600004a98",
   S5: "a538438afa2d235e015b555458d91a56",
   T1: "a40e1599d0ef9032608357af6d0366ee",
   T3: "b61c083983a5dbcb26a374cde223b3f2",
   T4: "f444024e3f2b067621c045d7acd14466",
+  "11B": "7d052c8b842dc81cbb517977a9b87877",
+  "13B": "403aa57f4fa593467f868948c4bcbab9",
+  S3: "e3df68216f1bc4e3f9835eaf0ef5b630",
 };
 
 /** Where a clip's picture plays from, or undefined until it's on Stream. */

@@ -741,6 +741,11 @@ export type Clip = {
   ines?: boolean;
   /** The line whose take is the voice reference. */
   voice?: string;
+  /**
+   * Master stills to use as Image 1 (and on) instead of the shot's own, when
+   * that still drifted from the set the rest of the film shows.
+   */
+  stills?: string[];
 };
 
 export const CLIP_STYLE =
@@ -871,8 +876,9 @@ export const CLIPS: Record<string, Clip> = {
   "11B": {
     shot: "11B",
     seconds: 7,
+    stills: ["03"],
     motion:
-      "Exactly the spacecraft in Image 1, a practical model miniature: the airlock hatch is open and a small astronaut in a white EVA suit pulls herself out hand over hand while the tether unspools behind her; a tiny pale blue Earth hangs far beyond. Slow, steady long-lens drift. Hard sun, black sky. Sound: near silence, her breathing, the tick of the tether reel.",
+      "The same spacecraft as in Image 1, a practical model miniature, but seen much closer: the cylindrical habitat where the long truss meets the big ring, its scorched beige panels, the ring curving away behind it. An airlock hatch on the habitat is open and a small astronaut in a white EVA suit pulls herself out hand over hand while the tether unspools behind her; a tiny pale blue Earth hangs far beyond. Keep the ship's design exactly as in Image 1, a ring on a truss, no other modules. Slow, steady long-lens drift. Hard sun, black sky. Sound: near silence, her breathing, the tick of the tether reel.",
   },
   "12B": {
     shot: "12B",
@@ -884,8 +890,9 @@ export const CLIPS: Record<string, Clip> = {
     shot: "13B",
     seconds: 8,
     voice: "13B",
+    stills: ["03"],
     motion:
-      "Exactly the spacecraft in Image 1: the astronaut in a white EVA suit on the hull turns to look along it, where a dead-straight line of scorch marks and small craters runs off into the distance. Slow push along the line of damage. Over her helmet radio she says in the voice of Audio 1: \"That's not one hit. That's a line. We flew through something.\" Sound: helmet-radio voice, breathing.",
+      "The same spacecraft as in Image 1, a practical model miniature, but seen much closer: an astronaut in a white EVA suit clings to the cylindrical habitat near the hub of the big ring, the long truss stretching away behind her. Keep the ship's design exactly as in Image 1, a ring on a truss, no other modules. She turns to look along the truss, where a dead-straight line of fresh black scorch marks and small craters runs off into the distance like a stitched seam. Slow push along the line of damage. Over her helmet radio she says in the voice of Audio 1: \"That's not one hit. That's a line. We flew through something.\" Hard sun, black sky. Sound: helmet-radio voice, breathing.",
   },
   "14": {
     shot: "14",
@@ -1032,8 +1039,9 @@ export const CLIPS: Record<string, Clip> = {
   S3: {
     shot: "S3",
     seconds: 7,
+    stills: ["02"],
     motion:
-      "Exactly the room in Image 1: the hut's old monitors flicker on one by one with incoming images, the cracked blue ice of an alien moon, plumes of vapor, a strange shoreline, and their light fills the empty hut. Slow push-in. Nobody is here. Sound: data chirps, rising static.",
+      "Exactly the room in Image 1, unchanged: the same beige consoles, desk lamp, enamel mug, speaker grille and empty chair, in the same warm lamplight. Nothing new is added to the room. The small boxy instrument on top of the console's left end is an old monitor: its screen flickers on with incoming pictures, the cracked blue ice of an alien moon, then plumes of vapor, then a strange shoreline, and its cold blue glow spills across the desk and the chair. The analog meters swing. Slow push-in. Nobody is here. Sound: data chirps, rising static.",
   },
   S4: {
     shot: "S4",
@@ -1240,21 +1248,24 @@ export const CUTS: Partial<Record<keyof typeof REELS, Sequence>> = {
       { kind: "sub", at: 14.5, line: "13A", dur: 3.4 },
     ],
   ),
-  // Out the airlock on the cut, her breathing carried from the wide into
-  // the visor, and the line of damage revealed on a push along the hull.
+  // Out the airlock in the wide, cut in close on the truss, her breathing
+  // carried into the visor, and the line of damage revealed on a push along
+  // the hull.
   outside: edit(
     [
-      { shot: "11B", clip: "11B", in: 3, dur: 4.3 },
+      { shot: "11B", clip: "11B", in: 0, dur: 2.8 },
+      { shot: "11B", clip: "11B", in: 4.9, dur: 2.1 },
       { shot: "12B", clip: "12B", in: 0, dur: 7.3 },
       { shot: "13B", clip: "13B", in: 1.8, dur: 6.2 },
     ],
     [
       { kind: "mood", at: 0, mood: "ambient" },
-      { kind: "fx", at: 0, sfx: "breathing", dur: 11.6, gain: 0.6 },
-      { kind: "sync", at: 0, clip: "11B", in: 3, dur: 4.3 },
-      { kind: "sync", at: 4.3, clip: "12B", in: 0, dur: 7.3 },
-      { kind: "sync", at: 11.6, clip: "13B", in: 1.8, dur: 6.2 },
-      { kind: "sub", at: 12.4, line: "13B", dur: 5.4 },
+      { kind: "fx", at: 0, sfx: "breathing", dur: 12.2, gain: 0.6 },
+      { kind: "sync", at: 0, clip: "11B", in: 0, dur: 2.8 },
+      { kind: "sync", at: 2.8, clip: "11B", in: 4.9, dur: 2.1 },
+      { kind: "sync", at: 4.9, clip: "12B", in: 0, dur: 7.3 },
+      { kind: "sync", at: 12.2, clip: "13B", in: 1.8, dur: 6.2 },
+      { kind: "sub", at: 13, line: "13B", dur: 5.4 },
     ],
   ),
   // She finds the course change on the screen before she says it. ARC

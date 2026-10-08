@@ -194,7 +194,9 @@ async function clip(id: string) {
   const c = CLIPS[id];
   const mp4 = join(OUT, "clips", `${id}.mp4`);
   if (existsSync(mp4)) return;
-  const images = [dataUri(master(c.shot), "image/jpeg")];
+  const images = (c.stills ?? [c.shot]).map((s) =>
+    dataUri(master(s), "image/jpeg"),
+  );
   if (c.ines)
     images.push(
       dataUri("public/last-signal/ines.webp", "image/webp"),

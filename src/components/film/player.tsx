@@ -91,7 +91,8 @@ const sleep = (ms: number, signal?: AbortSignal) =>
   });
 
 /** A cut on screen, with the audio-clock time it started, for lip sync. */
-type OnScreen = Cut & { start: number };
+/** A cut on screen. `light` overrides its shot's grade for this pass. */
+type OnScreen = Cut & { start: number; light?: Shot["light"] };
 
 type Listening = {
   hold: HoldId;
@@ -175,8 +176,9 @@ export function FilmPlayer() {
      * Plays a reel as a timeline: every cut and every sound cue is scheduled
      * against the audio clock up front, so sound can overlap cuts and sync
      * sound stays on the lips. Skipping jumps to the end of the reel.
+     * `light` regrades every cut aboard the ship, e.g. after the power is cut.
      */
-    const reel = async (name: keyof typeof REELS) => {
+    const reel = async (name: keyof typeof REELS, light?: Shot["light"]) => {
       if (signal.aborted) return;
       const seq = CUTS[name] ?? (await fromShots(REELS[name], sound));
       const both = skippable();
@@ -192,6 +194,11 @@ export function FilmPlayer() {
       ]);
       if (both.aborted) return;
       const t0 = sound.ctx.currentTime + 0.2;
+      const onScreen = (cut: Cut, start: number): OnScreen => ({
+        ...cut,
+        start,
+        light: light && aboard(cut) ? light : undefined,
+      });
       const timers: number[] = [];
       const at = (sec: number, f: () => void) =>
         timers.push(
@@ -207,7 +214,7 @@ export function FilmPlayer() {
 
       for (const cut of seq.cuts)
         at(cut.at, () => {
-          setStack((st) => [...st.slice(-1), { ...cut, start: t0 + cut.at }]);
+          setStack((st) => [...st.slice(-1), onScreen(cut, t0 + cut.at)]);
           if (!cut.clip) prefetchAfter(cut.shot);
         });
       for (const cue of seq.cues) place(cue);
@@ -250,7 +257,7 @@ export function FilmPlayer() {
         setSub(null);
         const last = seq.cuts.at(-1)!;
         if (!signal.aborted)
-          setStack((st) => [...st.slice(-1), { ...last, start: -1 }]);
+          setStack((st) => [...st.slice(-1), onScreen(last, -1)]);
       }
     };
 
@@ -312,7 +319,8 @@ export function FilmPlayer() {
     await reel("act2");
     const arc = await hold("arc");
     await reel(arc === "hear" ? "hear" : "unplug");
-    await reel("act3");
+    // Unplugging ARC leaves the ship on red emergency light for act 3.
+    await reel("act3", arc === "hear" ? undefined : "red");
     const final = await hold("final");
     const end: Ending =
       final === "static" || trust < TRUSTED ? "static" : (final as Ending);
@@ -498,6 +506,12 @@ async function fromShots(
   return { cuts, cues };
 }
 
+/** Whether a cut's camera is inside the ship, so it shares the ship's lighting. */
+function aboard(cut: Cut) {
+  const cam = cut.cam ?? shot(cut.shot).cam;
+  return cam !== "EXT" && cam !== "DISH";
+}
+
 /** One cut: a clip in sync with the audio clock, a still with a slow camera move, or a live ship screen. */
 function Frame({
   cut,
@@ -512,10 +526,11 @@ function Frame({
   const move = ["kb-in", "kb-left", "kb-out", "kb-right"][
     (s.id.charCodeAt(1) + Math.round(cut.start)) % 4
   ];
+  const light = cut.light ?? s.light;
   const grade =
-    s.light === "red"
+    light === "red"
       ? "after:bg-[#ff2a10]/25 after:mix-blend-multiply"
-      : s.light === "dawn"
+      : light === "dawn"
         ? "after:bg-[#ffb35c]/12 after:mix-blend-soft-light"
         : "";
   const cam = cut.cam ?? s.cam;
