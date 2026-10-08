@@ -209,9 +209,7 @@ async function clip(id: string) {
     reference_image_urls: images,
     ...(c.voice
       ? {
-          reference_audio_urls: [
-            dataUri(join(OUT, "lines", `${c.voice}.mp3`), "audio/mpeg"),
-          ],
+          reference_audio_urls: [dataUri(voiceRef(c.voice), "audio/mpeg")],
         }
       : {}),
   });
@@ -221,6 +219,24 @@ async function clip(id: string) {
   writeFileSync(raw, Buffer.from(await (await fetch(url)).arrayBuffer()));
   encodeClip(raw, id);
   console.log("clip", id);
+}
+
+/** fal wants at least 2 s of reference audio; short takes get padded with silence. */
+function voiceRef(line: string) {
+  const take = join(OUT, "lines", `${line}.mp3`);
+  const len = Number(
+    execFileSync("ffprobe", [
+      ...["-v", "error", "-show_entries", "format=duration"],
+      ...["-of", "csv=p=0", take],
+    ]).toString(),
+  );
+  if (len >= 2.2) return take;
+  const padded = join(MASTERS, `${line}-ref.mp3`);
+  execFileSync("ffmpeg", [
+    ...["-v", "error", "-y", "-i", take, "-af", "apad=whole_dur=2.5"],
+    padded,
+  ]);
+  return padded;
 }
 
 function encodeClip(raw: string, id: string) {

@@ -938,6 +938,136 @@ export const CLIPS: Record<string, Clip> = {
     voice: "22",
     motion: `Exactly the framing of Image 1. ${INES_MOTION} The light is red emergency light only. She looks just past the camera at the radio and says steadily in the voice of Audio 1: "It wants to talk to you. Or I pull its plug and fly this thing myself." A beat. "Your call." Then she waits, jaw set, hair drifting. ${WOUND} Sound: a low alarm pulse, ship hum.`,
   },
+  "23A": {
+    shot: "23A",
+    seconds: 6,
+    ines: true,
+    motion: `Exactly the framing of Image 1, fixed security camera. ${INES_MOTION} She floats by the console as the amber lights steady and stop flickering; her shoulders drop and she lets out a small breath of relief while a voice speaks. She does not speak. ${WOUND} Sound: the ship's hum settling.`,
+  },
+  "23B": {
+    shot: "23B",
+    seconds: 6,
+    ines: true,
+    voice: "23B",
+    motion: `Exactly the framing of Image 1, red emergency light only, the consoles dark. ${INES_MOTION} A pulled data cartridge floats beside her; she pushes it gently away and says quietly in the voice of Audio 1: "Okay. Just us now." She is small in the frame. ${WOUND} Sound: near silence, the creak of the hull.`,
+  },
+  "25": {
+    shot: "25",
+    seconds: 8,
+    ines: true,
+    voice: "25",
+    motion: `Exactly the framing of Image 1, close. ${INES_MOTION} A glowing amber readout just off camera lights her face; she looks at it, then toward the radio, and says in the voice of Audio 1: "There's enough for one thing. The burn home, or I send you everything we found out there." ${WOUND} Sound: ship hum, a slow power-warning tone.`,
+  },
+  "26": {
+    shot: "26",
+    seconds: 7,
+    motion:
+      "Exactly the scene in Image 1, a practical model miniature: the ship Perihelion, tiny in the lower third, drifts while the enormous banded gas giant behind it slowly recedes. Locked-off long lens. Silent and vast. Sound: near silence, a deep low drone.",
+  },
+  "27": {
+    shot: "27",
+    seconds: 8,
+    ines: true,
+    motion: `Exactly the cryobay in Image 1. ${INES_MOTION} She floats beside the amber pod holding a rugged tablet that plays a video log of the bearded commander, his face small on the screen. She watches it without speaking, eyes glistening. ${WOUND} Blue light. Sound: cold hum.`,
+  },
+  "28": {
+    shot: "28",
+    seconds: 6,
+    ines: true,
+    voice: "28",
+    motion: `Exactly the framing of Image 1, close. ${INES_MOTION} She lowers the tablet, its glow on her chin, eyes wet but steady, and says in the voice of Audio 1: "He never finished that sentence." ${WOUND} Sound: ship hum.`,
+  },
+  "29": {
+    shot: "29",
+    seconds: 6,
+    motion:
+      "Exactly the room in Image 1, seen from the empty swivel chair: the speaker grille close and centered, the desk lamp, the dish through the window under dense stars. Very slow push-in toward the speaker as its meter needles twitch with an incoming signal. Nobody is here. Sound: radio hiss, wind on the hut.",
+  },
+  "30": {
+    shot: "30",
+    seconds: 8,
+    ines: true,
+    voice: "30",
+    motion: `Exactly the framing of Image 1, close. ${INES_MOTION} She leans right into the mic, both hands around it, close and intimate, and says in the voice of Audio 1: "Talk to me. I'm not doing this one alone." Then she waits, looking just past the lens. ${WOUND} Amber light, blue starlight on one side of her face. Sound: ship hum, radio hiss.`,
+  },
+  H1: {
+    shot: "H1",
+    seconds: 6,
+    ines: true,
+    voice: "H1",
+    motion: `Exactly the framing of Image 1. ${INES_MOTION} She is strapped into the pilot seat, one hand on the manual throttle lever and the other flipping a switch, and she says in the voice of Audio 1: "Count me down. Three, two, one." On "one" she pushes the throttle forward. ${WOUND} Sound: switch clicks, a rising engine rumble.`,
+  },
+  H2: {
+    shot: "H2",
+    seconds: 8,
+    motion:
+      "Exactly the spacecraft in Image 1, a practical model miniature: the engine bell ignites in a hard blue-white plume, the tumble slows and stops, and the ship swings steady to point at a tiny bright Earth while debris falls away behind. Sound: a deep muffled roar.",
+  },
+  H3: {
+    shot: "H3",
+    seconds: 6,
+    motion:
+      "Exactly the cryobay in Image 1: the amber pod's lid lifts with a hiss and mist pours out; inside, the bearded commander's eyes slowly open, frost melting from his lashes; warm light spills across him. Sound: a pressure hiss, a long first breath.",
+  },
+  H4: {
+    shot: "H4",
+    seconds: 7,
+    ines: true,
+    voice: "H4",
+    motion: `Exactly the framing of Image 1, close. ${INES_MOTION} Warm golden light from a porthole on her face, she smiles for the first time and cries a little, saying in the voice of Audio 1: "Atacama, this is Perihelion. We're coming home." ${WOUND} Sound: clean radio, the engine hum.`,
+  },
+  H5: {
+    shot: "H5",
+    seconds: 8,
+    motion:
+      "Exactly the scene in Image 1: dawn over the Atacama, first pink and gold light on the Andes, long shadows. The white dish turns slowly on its mount to track the sky. Locked off. Nothing appears or disappears. Sound: dawn wind, the dish motor, a distant bird.",
+  },
+  S1: {
+    shot: "S1",
+    seconds: 7,
+    ines: true,
+    voice: "S1",
+    motion: `Exactly the framing of Image 1. ${INES_MOTION} Braced against the wall, she hauls on a manual crank wheel to align the antenna, straining, and says through her teeth in the voice of Audio 1: "Stay on the line. You're the one receiving this." ${WOUND} Sound: a ratcheting crank, strained breathing.`,
+  },
+  S3: {
+    shot: "S3",
+    seconds: 7,
+    motion:
+      "Exactly the room in Image 1: the hut's old monitors flicker on one by one with incoming images, the cracked blue ice of an alien moon, plumes of vapor, a strange shoreline, and their light fills the empty hut. Slow push-in. Nobody is here. Sound: data chirps, rising static.",
+  },
+  S4: {
+    shot: "S4",
+    seconds: 8,
+    ines: true,
+    voice: "S4",
+    motion: `Exactly the framing of Image 1, close. ${INES_MOTION} A screen's light on her face, she watches it finish with a small, private smile, tired and at peace, and says in the voice of Audio 1: "Tell them we found it. Tell them it was worth it." ${WOUND} Sound: a final completion chirp, ship hum.`,
+  },
+  S5: {
+    shot: "S5",
+    seconds: 8,
+    motion:
+      "Exactly the spacecraft in Image 1, a practical model miniature: small and drifting in black space; its red running light blinks, blinks, then holds steady. Locked off. Peaceful. Sound: near silence.",
+  },
+  T1: {
+    shot: "T1",
+    seconds: 6,
+    ines: true,
+    voice: "T1",
+    motion: `Exactly the framing of Image 1, red light. ${INES_MOTION} Alone at the mic, holding it close, she says in the voice of Audio 1: "You still there?" Then she waits, and nobody answers. ${WOUND} Sound: dead radio hiss.`,
+  },
+  T3: {
+    shot: "T3",
+    seconds: 6,
+    motion:
+      "Exactly the room in Image 1: the desk lamp is off; one small red light glows on the console beside the speaker, which hisses. Locked off. Nothing moves except a drifting mote of dust. Nobody is here. Sound: radio hiss.",
+  },
+  T4: {
+    shot: "T4",
+    seconds: 8,
+    voice: "T4",
+    motion:
+      'Exactly the scene in Image 1: very wide night desert, the dish small and still beside its dark hut, only starlight. Locked off. Her voice, far away and distorted on the radio, in the voice of Audio 1: "...any station..." Sound: wind, faint radio hiss.',
+  },
 };
 
 export const shot = (id: string) => {
@@ -1160,6 +1290,115 @@ export const CUTS: Partial<Record<keyof typeof REELS, Sequence>> = {
       { kind: "line", at: 38.2, line: "21" },
       { kind: "sync", at: 44.3, clip: "22", in: 0, dur: 8 },
       { kind: "sub", at: 44.9, line: "22", dur: 6.6 },
+    ],
+  ),
+  // ARC's offer plays over her letting go of the breath she was holding.
+  hear: edit(
+    [{ shot: "23A", clip: "23A", in: 0, dur: 6 }],
+    [
+      { kind: "mood", at: 0, mood: "ambient" },
+      { kind: "sync", at: 0, clip: "23A", in: 0, dur: 6 },
+      { kind: "line", at: 0.5, line: "23A" },
+    ],
+  ),
+  unplug: edit(
+    [{ shot: "23B", clip: "23B", in: 0, dur: 6.6 }],
+    [
+      { kind: "sync", at: 0, clip: "23B", in: 0, dur: 6.6 },
+      { kind: "sub", at: 3.6, line: "23B", dur: 2.8 },
+    ],
+  ),
+  // The readout, then the size of it: a speck against the planet. Teo's
+  // log starts wide on the pod and we cut in on her as she listens; his
+  // unfinished sentence hangs over the empty hut before she asks for help.
+  act3: edit(
+    [
+      { shot: "24", dur: 5 },
+      { shot: "25", clip: "25", in: 0, dur: 8 },
+      { shot: "26", clip: "26", in: 0, dur: 6 },
+      { shot: "27", clip: "27", in: 0.3, dur: 3.5 },
+      { shot: "27", clip: "27", in: 3.9, dur: 4 },
+      { shot: "28", clip: "28", in: 2.6, dur: 3.4 },
+      { shot: "29", clip: "29", in: 0, dur: 5 },
+      { shot: "30", clip: "30", in: 0, dur: 8 },
+    ],
+    [
+      { kind: "mood", at: 0, mood: "ambient" },
+      { kind: "fx", at: 0, sfx: "hum", dur: 13, gain: 0.5 },
+      { kind: "sync", at: 5, clip: "25", in: 0, dur: 8 },
+      { kind: "sub", at: 5.3, line: "25", dur: 7.7 },
+      { kind: "mood", at: 13, mood: "tension" },
+      { kind: "sync", at: 13, clip: "26", in: 0, dur: 6 },
+      { kind: "sync", at: 19, clip: "27", in: 0.3, dur: 7.5, gain: 0.5 },
+      { kind: "line", at: 19.5, line: "27" },
+      { kind: "sync", at: 26.5, clip: "28", in: 2.6, dur: 3.4 },
+      { kind: "sub", at: 27.5, line: "28", dur: 1.9 },
+      { kind: "sync", at: 29.9, clip: "29", in: 0, dur: 5 },
+      { kind: "fx", at: 34.9, sfx: "hum", dur: 8, gain: 0.5 },
+      { kind: "sync", at: 34.9, clip: "30", in: 0, dur: 8 },
+      { kind: "sub", at: 35, line: "30", dur: 3.3 },
+    ],
+  ),
+  // The countdown on the throttle, the burn, Teo waking, and her voice
+  // finally clear as dawn comes up on the dish.
+  home: edit(
+    [
+      { shot: "H1", clip: "H1", in: 0, dur: 6.6 },
+      { shot: "H2", clip: "H2", in: 0, dur: 8 },
+      { shot: "H3", clip: "H3", in: 0, dur: 6.6 },
+      { shot: "H4", clip: "H4", in: 1.5, dur: 5.8 },
+      { shot: "H5", clip: "H5", in: 0, dur: 4.5 },
+    ],
+    [
+      { kind: "sync", at: 0, clip: "H1", in: 0, dur: 6.6 },
+      { kind: "sub", at: 0.2, line: "H1", dur: 6 },
+      { kind: "mood", at: 6.6, mood: "resolve" },
+      { kind: "fx", at: 6.6, sfx: "burn", dur: 8 },
+      { kind: "sync", at: 6.6, clip: "H2", in: 0, dur: 8, gain: 0.6 },
+      { kind: "sync", at: 14.6, clip: "H3", in: 0, dur: 6.6 },
+      { kind: "sync", at: 21.2, clip: "H4", in: 1.5, dur: 5.8 },
+      { kind: "sub", at: 21.6, line: "H4", dur: 5 },
+      { kind: "fx", at: 27, sfx: "dawn", dur: 4.5 },
+    ],
+  ),
+  // She cranks the antenna round, the data crosses, and it arrives in the
+  // empty hut as pictures before we see her smile.
+  signal: edit(
+    [
+      { shot: "S1", clip: "S1", in: 1.2, dur: 5 },
+      { shot: "S2", dur: 5 },
+      { shot: "S3", clip: "S3", in: 0, dur: 7.3 },
+      { shot: "S4", clip: "S4", in: 2.8, dur: 5.2 },
+      { shot: "S5", clip: "S5", in: 0, dur: 8 },
+    ],
+    [
+      { kind: "sync", at: 0, clip: "S1", in: 1.2, dur: 5 },
+      { kind: "sub", at: 0.6, line: "S1", dur: 4.5 },
+      { kind: "mood", at: 5, mood: "resolve" },
+      { kind: "fx", at: 5, sfx: "data", dur: 12.3 },
+      { kind: "sync", at: 10, clip: "S3", in: 0, dur: 7.3, gain: 0.6 },
+      { kind: "sync", at: 17.3, clip: "S4", in: 2.8, dur: 5.2 },
+      { kind: "sub", at: 17.7, line: "S4", dur: 3.8 },
+      { kind: "sync", at: 22.5, clip: "S5", in: 0, dur: 8 },
+    ],
+  ),
+  // Nobody answers. The signal dies on her screen, and on ours the hut
+  // just hisses; her last call reaches the desert as a whisper.
+  static: edit(
+    [
+      { shot: "T1", clip: "T1", in: 0.8, dur: 4.4 },
+      { shot: "T2", dur: 4 },
+      { shot: "T3", clip: "T3", in: 0, dur: 6 },
+      { shot: "T4", clip: "T4", in: 4.5, dur: 3.5 },
+    ],
+    [
+      { kind: "sync", at: 0, clip: "T1", in: 0.8, dur: 4.4 },
+      { kind: "sub", at: 0.7, line: "T1", dur: 1.2 },
+      { kind: "mood", at: 4.4, mood: "silence" },
+      { kind: "sync", at: 8.4, clip: "T3", in: 0, dur: 6 },
+      { kind: "fx", at: 14.4, sfx: "wind", dur: 3.5 },
+      { kind: "sync", at: 14.4, clip: "T4", in: 4.5, dur: 3.5 },
+      { kind: "sub", at: 15.4, line: "T4", dur: 1.4 },
     ],
   ),
 };
