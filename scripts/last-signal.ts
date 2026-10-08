@@ -12,7 +12,13 @@
  * (default: .last-signal-masters/, not committed); the site gets 1920px WebP.
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import {
   allLines,
@@ -100,7 +106,9 @@ async function fal(model: string, input: object) {
     body: JSON.stringify(input),
   });
   if (!queued.ok) throw new Error(`${queued.status} ${await queued.text()}`);
-  const { status_url, response_url } = await queued.json();
+  const { request_id, status_url, response_url } = await queued.json();
+  // Logged so a run that dies midway can still collect what it paid for.
+  appendFileSync(join(MASTERS, "fal-requests.log"), `${model} ${request_id}\n`);
   for (;;) {
     await sleep(3000);
     const s = await (await fetch(status_url, { headers })).json();

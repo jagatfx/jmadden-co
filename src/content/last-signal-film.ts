@@ -750,6 +750,10 @@ export const CLIP_STYLE =
 const INES_MOTION =
   "The woman astronaut from Image 2 and Image 3: same face, worn grey flight suit with the orange-planet mission patch, dark hair tied back with loose strands floating weightless, dried blood at her left temple.";
 
+/** Clips lost the cut at her temple partway through; this keeps it on. */
+const WOUND =
+  "The dried-blood cut at her temple stays exactly as in Image 2 for the whole shot.";
+
 /** The comms camera: a small camera above the radio panel, for her close-ups. */
 const COMMS =
   "A small camera mounted above the radio panel of the habitat in Image 1 looks back at her:";
@@ -759,7 +763,7 @@ export const CLIPS: Record<string, Clip> = {
     shot: "01",
     seconds: 7,
     motion:
-      "Exactly the scene in Image 1: night in the Atacama desert, a lone white radio-telescope dish on bare rocky ground beside a small hut with one warm lit window, the Milky Way overhead, silhouetted Andes. Very slow push-in toward the hut across the rocks, as if on a dolly at ground level. The dish turns a few degrees on its mount with a mechanical groan; dust lifts off the ground in a gust; stars twinkle. Sound: cold desert wind, the faint creak of the dish motor.",
+      "Exactly the scene in Image 1, but the foreground is bare, flat, hard-packed desert ground with no rocks or boulders: night in the Atacama, a lone white radio-telescope dish beside a small hut with one warm lit window, the Milky Way overhead, silhouetted Andes. Very slow, smooth push-in toward the hut at ground level. The dish turns a few degrees on its mount; a thin veil of dust drifts across the ground; stars twinkle. Nothing appears or disappears. Sound: cold desert wind, the faint creak of the dish motor.",
   },
   "02": {
     shot: "02",
@@ -816,19 +820,19 @@ export const CLIPS: Record<string, Clip> = {
     shot: "08",
     seconds: 6,
     motion:
-      "Exactly the scene in Image 1: first-person helmet camera, slight fisheye, handheld and shaky, a gloved hand in the foreground. Entering a cramped spacecraft greenhouse module: tomato plants and lettuce in grow trays, leaves and soil whipping violently toward a fist-sized hole in the hull wall, white sealant foam spraying from a nozzle and failing, being sucked out, purple-pink grow lights flickering, frost forming across the panels. The gloved hand reaches for a rail. Sound: roaring air escaping, a shrill pressure alarm, rattling trays, heavy breathing inside a helmet.",
+      "Exactly the scene in Image 1: first-person helmet camera, slight fisheye, handheld, a gloved hand in the foreground. A cramped spacecraft greenhouse: tomato plants and lettuce stay rooted in their grow trays, leaves fluttering hard toward a fist-sized hole in the hull wall. The hole stays a clean, sharp-edged dark opening onto black space and stars the whole time. White sealant foam sprays from a nozzle at its edge and is torn away in thin streams. Purple-pink grow lights flicker; frost creeps across the panels. The gloved hand reaches for a rail and grips it. Nothing passes in front of the lens. Sound: roaring air escaping, a shrill pressure alarm, rattling trays, heavy breathing inside a helmet.",
   },
   "08s": {
     shot: "08",
     seconds: 6,
-    motion:
-      "Fixed security camera high in a corner of the cramped spacecraft greenhouse from Image 1, slight wide-angle distortion, slightly desaturated: rows of tomato plants and lettuce in grow trays, leaves and soil streaming toward a fist-sized hole in the hull wall, white sealant foam spraying and failing, purple-pink grow lights flickering, frost spreading across the panels. The hatch at the near end swings open and an astronaut in a pressure-suit helmet pulls herself in hand over hand, braced against the gale. Sound: roaring escaping air, a shrill pressure alarm, rattling trays.",
+    ines: true,
+    motion: `Fixed security camera high in a corner of the cramped spacecraft greenhouse from Image 1, slight wide-angle distortion, slightly desaturated: tomato plants and lettuce in grow trays, leaves streaming toward a fist-sized hole in the hull wall, sealant foam spraying and failing, purple-pink grow lights flickering, frost spreading. The hatch at the near end swings open and she pulls herself in hand over hand, braced against the gale. ${INES_MOTION} She wears her grey flight suit with a clear-visor emergency hood over her head, her face visible through it. Her outfit stays exactly the same for the whole shot. Sound: roaring escaping air, a shrill pressure alarm, rattling trays.`,
   },
   "09": {
     shot: "09",
     seconds: 8,
     ines: true,
-    motion: `Exactly the framing of Image 1: fixed high-corner security camera looking down into the habitat. ${INES_MOTION} She is busy at a console, then stops mid-task, and slowly lifts her eyes straight up into the security camera lens with open distrust. She holds the look, saying nothing, her jaw tight. Amber light. She does not speak. Sound: ship hum.`,
+    motion: `Exactly the framing of Image 1: fixed high-corner security camera looking down into the habitat. ${INES_MOTION} She is busy at a console, then stops mid-task and slowly lifts her eyes straight up into the security camera lens with open distrust. She holds the look, jaw tight, and does not speak. ${WOUND} Amber light. Sound: ship hum.`,
   },
   "10": {
     shot: "10",
@@ -843,6 +847,96 @@ export const CLIPS: Record<string, Clip> = {
     ines: true,
     voice: "10",
     motion: `${COMMS} tight close-up at eye level, locked off. ${INES_MOTION} She looks straight into the lens, steady, and says quietly in the voice of Audio 1: "ARC says seal." A beat. Softer: "What would you do?" Then she holds the look, waiting for an answer, barely moving, breathing, blinking once, loose hair drifting. Amber light from below, blue rim light from a porthole. Sound: ship hum, low radio hiss.`,
+  },
+  "11A": {
+    shot: "11A",
+    seconds: 6,
+    motion:
+      "Exactly the scene in Image 1, locked-off security camera in a dark corridor: the heavy round greenhouse hatch has just slammed shut and still shudders; locking bolts drive home one by one; a red SEALED lamp blinks on. Through the hatch's small window, frost blooms across the tomato plants and the purple grow lights die out one by one. Sound: a heavy clang, bolts locking, the hiss of air cut off, then silence and creaking ice.",
+  },
+  "12A": {
+    shot: "12A",
+    seconds: 6,
+    voice: "12A",
+    motion:
+      "Exactly the scene in Image 1, first-person helmet view, slight fisheye: a gloved hand presses flat on the frosted round window of the sealed hatch, then slowly drags down through the frost, leaving a clear streak. Through it, the frozen white tomato plants. Her breath fogs the edge of the visor as she says in the voice of Audio 1: \"Sun Mei's tomatoes. She's going to kill me.\" Sound: muffled breathing inside a helmet, creaking ice.",
+  },
+  "13A": {
+    shot: "13A",
+    seconds: 7,
+    ines: true,
+    voice: "13A",
+    motion: `Exactly the framing of Image 1, fixed high-corner security camera. ${INES_MOTION} She floats over a scuffed rugged tablet doing sums, tapping, a pencil drifting beside her; she exhales and says quietly in the voice of Audio 1: "Less air. But nobody went outside." ${WOUND} Amber light. Sound: ship hum, the tap of a stylus.`,
+  },
+  "11B": {
+    shot: "11B",
+    seconds: 7,
+    motion:
+      "Exactly the spacecraft in Image 1, a practical model miniature: the airlock hatch is open and a small astronaut in a white EVA suit pulls herself out hand over hand while the tether unspools behind her; a tiny pale blue Earth hangs far beyond. Slow, steady long-lens drift. Hard sun, black sky. Sound: near silence, her breathing, the tick of the tether reel.",
+  },
+  "12B": {
+    shot: "12B",
+    seconds: 7,
+    motion:
+      "Exactly the scene in Image 1, first-person view through a helmet visor, slight fisheye: two white EVA gloves press a square metal patch over the jagged hole in the scorched hull and smooth down its edges. A sharp flake of debris tumbles past very close to the visor, glinting, and the hands freeze for a beat. Sound: loud breathing, a heartbeat, the scrape of the patch.",
+  },
+  "13B": {
+    shot: "13B",
+    seconds: 8,
+    voice: "13B",
+    motion:
+      "Exactly the spacecraft in Image 1: the astronaut in a white EVA suit on the hull turns to look along it, where a dead-straight line of scorch marks and small craters runs off into the distance. Slow push along the line of damage. Over her helmet radio she says in the voice of Audio 1: \"That's not one hit. That's a line. We flew through something.\" Sound: helmet-radio voice, breathing.",
+  },
+  "14": {
+    shot: "14",
+    seconds: 6,
+    ines: true,
+    motion: `Exactly the framing of Image 1, fixed security camera. ${INES_MOTION} She is braced at the cluttered console, typing on a chunky keyboard while green text scrolls on an old phosphor CRT and lights her face from below; she stops, scrolls back and leans closer. ${WOUND} Sound: keyboard clacks, CRT whine, ship hum.`,
+  },
+  "16": {
+    shot: "16",
+    seconds: 6,
+    ines: true,
+    voice: "16",
+    motion: `Exactly the framing of Image 1, close-up. ${INES_MOTION} Her face is lit green by a CRT just off camera, scrolling text reflected in her eyes. She reads, stops, and says, stunned, in the voice of Audio 1: "ARC changed course. Forty-one minutes before we got hit." ${WOUND} Shallow focus. Sound: CRT whine.`,
+  },
+  "17": {
+    shot: "17",
+    seconds: 7,
+    ines: true,
+    motion: `Exactly the framing of Image 1, fixed security camera. ${INES_MOTION} Arms folded, she stares straight up into the lens, hard and unblinking, listening to a voice we don't see. She does not speak; only her jaw tightens. ${WOUND} Sound: ship hum.`,
+  },
+  "18": {
+    shot: "18",
+    seconds: 5,
+    ines: true,
+    voice: "18",
+    motion: `Exactly the framing of Image 1. ${INES_MOTION} Head tipped back against the wall, eyes closed, she gives one bitter, humorless breath of a laugh and says in the voice of Audio 1: "Within tolerance." ${WOUND} Sound: ship hum.`,
+  },
+  "19": {
+    shot: "19",
+    seconds: 6,
+    motion:
+      "Exactly the cryobay in Image 1, locked-off security camera: three frosted pods; the nearest pod's status light flickers from green to amber and stays amber; frost thickens visibly on its glass. Sound: cold hum, a slow warning beep.",
+  },
+  "20": {
+    shot: "20",
+    seconds: 6,
+    ines: true,
+    motion: `Exactly the scene in Image 1. ${INES_MOTION} She drifts up to the amber pod and lays her hand on the frosted glass, wiping a patch clear to show the frozen face of the bearded commander inside, still, eyes closed. She holds there. ${WOUND} Blue cold light, amber status glow. Sound: cold hum, a soft beep.`,
+  },
+  "21": {
+    shot: "21",
+    seconds: 6,
+    ines: true,
+    motion: `Exactly the framing of Image 1, fixed security camera. ${INES_MOTION} Her back to the camera, she faces the radio console, shoulders tense, one hand closing around the mic while a voice speaks. She does not speak. Sound: ship hum.`,
+  },
+  "22": {
+    shot: "22",
+    seconds: 8,
+    ines: true,
+    voice: "22",
+    motion: `Exactly the framing of Image 1. ${INES_MOTION} The light is red emergency light only. She looks just past the camera at the radio and says steadily in the voice of Audio 1: "It wants to talk to you. Or I pull its plug and fly this thing myself." A beat. "Your call." Then she waits, jaw set, hair drifting. ${WOUND} Sound: a low alarm pulse, ship hum.`,
   },
 };
 
@@ -996,6 +1090,76 @@ export const CUTS: Partial<Record<keyof typeof REELS, Sequence>> = {
       { kind: "sync", at: 20.2, clip: "10", in: 0, dur: 8.6 },
       { kind: "sub", at: 20.4, line: "10", dur: 9.4 },
       { kind: "sync", at: 28.7, clip: "10c", in: 6.2 },
+    ],
+  ),
+  // The hatch shuts on everything they grew. Her glove on the glass, then
+  // the cost in a wide: she says it to herself, not to us.
+  seal: edit(
+    [
+      { shot: "11A", clip: "11A", in: 0, dur: 5 },
+      { shot: "12A", clip: "12A", in: 0.4, dur: 6.2 },
+      { shot: "13A", clip: "13A", in: 0.6, dur: 6.7 },
+    ],
+    [
+      { kind: "mood", at: 0, mood: "ambient" },
+      { kind: "sync", at: 0, clip: "11A", in: 0, dur: 5 },
+      { kind: "sync", at: 5, clip: "12A", in: 0.4, dur: 6.2 },
+      { kind: "sub", at: 6.6, line: "12A", dur: 4.5 },
+      { kind: "fx", at: 11.2, sfx: "hum", dur: 6.7, gain: 0.5 },
+      { kind: "sync", at: 11.2, clip: "13A", in: 0.6, dur: 6.7 },
+      { kind: "sub", at: 14.5, line: "13A", dur: 3.4 },
+    ],
+  ),
+  // Out the airlock on the cut, her breathing carried from the wide into
+  // the visor, and the line of damage revealed on a push along the hull.
+  outside: edit(
+    [
+      { shot: "11B", clip: "11B", in: 3, dur: 4.3 },
+      { shot: "12B", clip: "12B", in: 0, dur: 7.3 },
+      { shot: "13B", clip: "13B", in: 1.8, dur: 6.2 },
+    ],
+    [
+      { kind: "mood", at: 0, mood: "ambient" },
+      { kind: "fx", at: 0, sfx: "breathing", dur: 11.6, gain: 0.6 },
+      { kind: "sync", at: 0, clip: "11B", in: 3, dur: 4.3 },
+      { kind: "sync", at: 4.3, clip: "12B", in: 0, dur: 7.3 },
+      { kind: "sync", at: 11.6, clip: "13B", in: 1.8, dur: 6.2 },
+      { kind: "sub", at: 12.4, line: "13B", dur: 5.4 },
+    ],
+  ),
+  // She finds the course change on the screen before she says it. ARC
+  // answers over her stare up at its lens, the pod turns amber on a cut,
+  // and the choice lands in red, on her.
+  act2: edit(
+    [
+      { shot: "14", clip: "14", in: 0, dur: 5 },
+      { shot: "15", dur: 4 },
+      { shot: "16", clip: "16", in: 0.6, dur: 5.8 },
+      { shot: "17", clip: "17", in: 0, dur: 7.3 },
+      { shot: "18", clip: "18", in: 1.2, dur: 4 },
+      { shot: "19", clip: "19", in: 0, dur: 5 },
+      { shot: "20", clip: "20", in: 0, dur: 6.6 },
+      { shot: "21", clip: "21", in: 0, dur: 6.6 },
+      { shot: "22", clip: "22", in: 0, dur: 8 },
+    ],
+    [
+      { kind: "fx", at: 0, sfx: "hum", dur: 26.1, gain: 0.5 },
+      { kind: "sync", at: 0, clip: "14", in: 0, dur: 5 },
+      { kind: "mood", at: 5, mood: "tension" },
+      { kind: "fx", at: 5, sfx: "alert", gain: 0.6 },
+      { kind: "sync", at: 9, clip: "16", in: 0.6, dur: 5.8 },
+      { kind: "sub", at: 9.5, line: "16", dur: 5.1 },
+      { kind: "sync", at: 14.8, clip: "17", in: 0, dur: 7.3, gain: 0.6 },
+      { kind: "line", at: 15.3, line: "17" },
+      { kind: "sync", at: 22.1, clip: "18", in: 1.2, dur: 4 },
+      { kind: "sub", at: 22.8, line: "18", dur: 2.5 },
+      { kind: "sync", at: 26.1, clip: "19", in: 0, dur: 5 },
+      { kind: "sync", at: 31.1, clip: "20", in: 0, dur: 6.6 },
+      { kind: "fx", at: 37.7, sfx: "hum", dur: 14.6, gain: 0.5 },
+      { kind: "sync", at: 37.7, clip: "21", in: 0, dur: 6.6, gain: 0.6 },
+      { kind: "line", at: 38.2, line: "21" },
+      { kind: "sync", at: 44.3, clip: "22", in: 0, dur: 8 },
+      { kind: "sub", at: 44.9, line: "22", dur: 6.6 },
     ],
   ),
 };
