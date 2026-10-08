@@ -21,7 +21,6 @@ export const STREAM_IDS: Partial<Record<string, string>> = {
   "20": "7d701b1e60a8eecb65f5d4fb8c5a48cb",
   "21": "7b0cb4eb9c8dde2674e14faa0f657e0d",
   "22": "861a42c0b74c12176790d1e9596b2fb6",
-  "01": "5690c33611fb6694c634396e7e4517c5",
   "02": "0e02b901fe1d2b38e24d214a8ac8c5d5",
   "03": "7efb17069ca02ce0d42e230185a276cb",
   "03w": "c71ba7e9fc0031d7313882c71cc44f50",
@@ -30,9 +29,6 @@ export const STREAM_IDS: Partial<Record<string, string>> = {
   "05c": "c43e78271f8576edc8e112d5dc6754a4",
   "06": "472a97ede6987b2396df66f7cb91664d",
   "07": "f30d88b4dde0fc0792727eae4c0e051a",
-  "08": "58d06c7028b70c79035963f11ba83529",
-  "08s": "c983bf588502f3293312ce2d9025abe5",
-  "09": "56f1f9d8e5f827ff3120caa1fa5a1c4a",
   "10c": "4c5ca4abbe917ed4918c9e9972b50dd4",
   "11A": "d9c5fb10c8de500e89de94b28b0441b6",
   "12A": "dac143ccc04333953886e6a2f3f86c1f",
@@ -40,6 +36,10 @@ export const STREAM_IDS: Partial<Record<string, string>> = {
   "11B": "7e67f0feede858cc5302282cec137f4f",
   "12B": "b36086290aa2dba98a5cdcfe4b95a082",
   "13B": "c95add7dfe2a92b5383cb6b1388759cb",
+  "01": "0839728511588f5cfa44f0a277c2c503",
+  "08": "d032f43e131643aa72b17340ed9f3f18",
+  "08s": "87a9f93aece68878ba5a48659f9ff908",
+  "09": "edd879f72857b7d2192469adb36208e8",
 };
 
 /** Where a clip's picture plays from, or undefined until it's on Stream. */
