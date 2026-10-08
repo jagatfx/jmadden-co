@@ -2,26 +2,22 @@ import type { Metadata } from "next";
 import { DinnerPartyStage } from "@/components/dinner-party/stage";
 
 export const metadata: Metadata = {
-  title: "Dinner Party: look test",
+  title: "Dinner Party",
   description:
-    "Trip and Grace, rigged and lit in the browser. A first look before the full film.",
+    "Drinks at Trip and Grace's. Walk their loft, say anything, and see where the night goes.",
   robots: { index: false, follow: false },
 };
 
-export default function DinnerPartyLookTest() {
+export default function DinnerPartyPage() {
   return (
     <section className="px-4 py-10 sm:px-8">
       <DinnerPartyStage />
       <div className="mx-auto mt-8 max-w-3xl space-y-3 text-sm opacity-80">
         <p>
-          Look test for <em>Dinner Party</em>. You arrive for drinks at Trip and
-          Grace&apos;s. Trip asks what you&apos;re having: answer out loud or
-          type it, and they react.
-        </p>
-        <p>
-          Everything here runs live in the browser: two rigged characters with
-          66 face shapes each, lip-synced to their lines, lit and cut like
-          coverage.
+          You&apos;re their oldest friend, over for drinks. They&apos;re
+          fighting about something before you even knock. Talk to them, take
+          sides or don&apos;t, pick things up, wander off. The night goes a
+          different way each time.
         </p>
       </div>
     </section>

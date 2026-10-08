@@ -80,13 +80,29 @@ function box(
   return m;
 }
 
-export type SetLights = {
+export type PropId =
+  | "photo"
+  | "painting"
+  | "phone"
+  | "letter"
+  | "suitcase"
+  | "door"
+  | "sofa"
+  | "bottles";
+
+export type BuiltSet = {
   /** Lamps that slowly warm up as the night goes on. */
   pendants: THREE.PointLight[];
   window: THREE.DirectionalLight;
+  /** Things the guest can pick up, look at, sit on or walk out of. */
+  props: Record<PropId, THREE.Object3D>;
+  /** Furniture footprints on the floor (x0, z0, x1, z1), for walking. */
+  blocks: [number, number, number, number][];
+  /** The phone's screen, lit when it buzzes. */
+  phoneScreen: THREE.MeshStandardMaterial;
 };
 
-export function buildSet(scene: THREE.Scene, base: string): SetLights {
+export function buildSet(scene: THREE.Scene, base: string): BuiltSet {
   scene.background = new THREE.Color(0x05070c);
   scene.fog = new THREE.Fog(0x05070c, 9, 22);
 
@@ -134,6 +150,83 @@ export function buildSet(scene: THREE.Scene, base: string): SetLights {
     side.receiveShadow = true;
     scene.add(side);
   }
+  // Front wall: the front door, and the hall closet left ajar
+  const front = new THREE.Shape();
+  front.moveTo(-5, 0);
+  front.lineTo(5, 0);
+  front.lineTo(5, 3.6);
+  front.lineTo(-5, 3.6);
+  for (const [x0, x1] of [
+    [0.7, 1.7],
+    [3.1, 4.1],
+  ]) {
+    const h = new THREE.Path();
+    h.moveTo(x0, 0);
+    h.lineTo(x1, 0);
+    h.lineTo(x1, 2.15);
+    h.lineTo(x0, 2.15);
+    front.holes.push(h);
+  }
+  const frontPlaster = plaster.clone();
+  frontPlaster.side = THREE.DoubleSide;
+  const frontWall = new THREE.Mesh(
+    new THREE.ShapeGeometry(front),
+    frontPlaster,
+  );
+  frontWall.position.z = 4.4;
+  frontWall.receiveShadow = true;
+  scene.add(frontWall);
+  const doorWood = std(0x2b2724, 0.55);
+  const door = new THREE.Group();
+  const leaf = box(0.98, 2.12, 0.05, doorWood, 0.49, 1.06, 0, 0.01);
+  door.add(leaf);
+  const knob = new THREE.Mesh(
+    new THREE.SphereGeometry(0.03, 12, 8),
+    std(0xb08d57, 0.3, 1),
+  );
+  knob.position.set(0.86, 1.0, -0.05);
+  door.add(knob);
+  door.position.set(0.71, 0, 4.42);
+  scene.add(door);
+  // The closet: a shallow box behind the wall, its door swung open.
+  const closet = new THREE.Group();
+  closet.add(box(1.0, 2.2, 0.02, plaster, 0, 1.1, 0.72, 0.005));
+  closet.add(box(0.02, 2.2, 0.72, plaster, -0.5, 1.1, 0.36, 0.005));
+  closet.add(box(0.02, 2.2, 0.72, plaster, 0.5, 1.1, 0.36, 0.005));
+  closet.add(box(1.0, 0.02, 0.72, std(0x3a3430, 0.9), 0, 0.01, 0.36, 0.005));
+  closet.position.set(3.6, 0, 4.4);
+  scene.add(closet);
+  const closetDoor = box(0.98, 2.12, 0.04, doorWood, 0.49, 1.06, 0, 0.01);
+  const hinge = new THREE.Group();
+  hinge.add(closetDoor);
+  hinge.position.set(3.11, 0, 4.4);
+  hinge.rotation.y = -1.9;
+  scene.add(hinge);
+  for (let i = 0; i < 3; i++) {
+    const coat = box(
+      0.42,
+      0.95,
+      0.12,
+      std([0x2d3340, 0x4a3a2a, 0x1f1f22][i], 0.95),
+      3.3 + i * 0.22,
+      1.45,
+      4.95,
+      0.05,
+    );
+    scene.add(coat);
+  }
+  const suitcase = new THREE.Group();
+  suitcase.add(box(0.46, 0.66, 0.26, std(0x8a2f2a, 0.55), 0, 0.38, 0, 0.04));
+  const handle = new THREE.Mesh(
+    new THREE.TorusGeometry(0.06, 0.012, 8, 16, Math.PI),
+    std(0x111111, 0.4),
+  );
+  handle.position.y = 0.72;
+  suitcase.add(handle);
+  suitcase.position.set(3.8, 0.02, 4.85);
+  suitcase.rotation.y = 0.25;
+  scene.add(suitcase);
+
   const ceiling = new THREE.Mesh(
     new THREE.PlaneGeometry(10, 9),
     std(0x2a2622, 1),
@@ -250,8 +343,8 @@ export function buildSet(scene: THREE.Scene, base: string): SetLights {
     g.position.set(-0.2 + i * 0.12, 0.33, 0.1);
     cart.add(g);
   }
-  cart.position.set(-1.9, 0, 0.1);
-  cart.rotation.y = 0.4;
+  cart.position.set(-2.5, 0, -1.75);
+  cart.rotation.y = 0;
   scene.add(cart);
 
   // Sideboard with the Venice photo
@@ -278,7 +371,64 @@ export function buildSet(scene: THREE.Scene, base: string): SetLights {
   photo.position.x = 0.018;
   photo.rotation.y = Math.PI / 2;
   frame.add(photo);
-  scene.add(frame);
+  const photoProp = new THREE.Group();
+  photoProp.add(frame);
+  scene.add(photoProp);
+
+  // Trip's phone, face up on the sideboard
+  const phoneScreen = new THREE.MeshStandardMaterial({
+    color: 0x05070a,
+    emissive: 0x9fc4ff,
+    emissiveIntensity: 0,
+    roughness: 0.2,
+  });
+  const phone = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.009, 0.155), [
+    std(0x1a1a1c, 0.4, 0.5),
+    std(0x1a1a1c, 0.4, 0.5),
+    phoneScreen,
+    std(0x1a1a1c, 0.4, 0.5),
+    std(0x1a1a1c, 0.4, 0.5),
+    std(0x1a1a1c, 0.4, 0.5),
+  ]);
+  phone.position.set(-4.62, 0.805, -0.05);
+  phone.rotation.y = 0.3;
+  scene.add(phone);
+
+  // Side table by the sofa, with Grace's letter half under a book
+  const sideTable = new THREE.Group();
+  const top = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.26, 0.26, 0.03, 32),
+    walnut,
+  );
+  top.position.y = 0.55;
+  top.castShadow = top.receiveShadow = true;
+  const stem = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.03, 0.05, 0.55, 12),
+    walnut,
+  );
+  stem.position.y = 0.275;
+  sideTable.add(top, stem);
+  sideTable.position.set(1.45, 0, -1.95);
+  scene.add(sideTable);
+  const letter = new THREE.Mesh(
+    new THREE.BoxGeometry(0.21, 0.003, 0.28),
+    std(0xf4f1ea, 0.9),
+  );
+  letter.position.set(1.42, 0.568, -1.9);
+  letter.rotation.y = 0.5;
+  scene.add(letter);
+  const book = box(
+    0.17,
+    0.035,
+    0.24,
+    std(0x2c4a5a, 0.8),
+    1.52,
+    0.585,
+    -2.0,
+    0.005,
+  );
+  book.rotation.y = -0.2;
+  scene.add(book);
   const lamp = new THREE.Mesh(
     new THREE.SphereGeometry(0.16, 24, 16),
     new THREE.MeshStandardMaterial({
@@ -337,5 +487,36 @@ export function buildSet(scene: THREE.Scene, base: string): SetLights {
   win.position.set(-1, 3, -6);
   scene.add(win);
 
-  return { pendants, window: win };
+  // The bar's bottles, as one thing to reach for
+  const bottles = new THREE.Group();
+  cart.updateMatrixWorld(true);
+  for (const b of cart.children.filter(
+    (o) =>
+      (o as THREE.Mesh).geometry instanceof THREE.CylinderGeometry &&
+      o.position.y > 0.9,
+  ))
+    bottles.attach(b);
+  scene.add(bottles);
+
+  return {
+    pendants,
+    window: win,
+    props: {
+      photo: photoProp,
+      painting: canvas,
+      phone,
+      letter,
+      suitcase,
+      door,
+      sofa,
+      bottles,
+    },
+    blocks: [
+      [1.8, -2.6, 4.2, -1.5], // sofa
+      [-3.0, -2.05, -2.0, -1.45], // bar cart
+      [-5, -1.4, -4.4, 0.6], // sideboard
+      [1.15, -2.25, 1.75, -1.65], // side table
+    ],
+    phoneScreen,
+  };
 }
