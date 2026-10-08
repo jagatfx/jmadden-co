@@ -4,20 +4,26 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   allLines,
+  CUTS,
   HOLDS,
+  line as lineById,
   REELS,
   SFX,
   shot,
   type Cam,
+  type Cue,
+  type Cut,
   type HoldId,
   type Line,
   type Outcome,
+  type Sequence,
   type Shot,
 } from "@/content/last-signal-film";
+import { clipSrc } from "@/content/last-signal-stream";
 import { read, TRUSTED } from "@/lib/last-signal-intent";
 import { InsertScreen } from "./inserts";
 import { listen, primeMic, speechSupported } from "./listen";
-import { FilmSound, type Mood } from "./sound";
+import { FilmSound, sfxUrl, syncUrl, type Mood } from "./sound";
 
 type Ending = "home" | "signal" | "static";
 
@@ -42,7 +48,7 @@ const ENDINGS: Record<
   },
 };
 
-/** Where the score changes, by the shot it changes on. */
+/** Where the score changes in reels still played as stills, by shot. */
 const MOODS: Record<string, Mood> = {
   "01": "ambient",
   "08": "tension",
@@ -61,6 +67,7 @@ const CAM_NAMES: Partial<Record<Cam, string>> = {
   "SEC-01": "SEC-01 · HAB",
   "SEC-02": "SEC-02 · CRYOBAY",
   "SEC-03": "SEC-03 · GREENHOUSE",
+  COMMS: "COMMS · RADIO",
 };
 
 const WHO_COLOR = { INES: "text-sun", ARC: "text-pink", TEO: "text-[#7dffa8]" };
@@ -83,6 +90,10 @@ const sleep = (ms: number, signal?: AbortSignal) =>
     });
   });
 
+/** A cut on screen, with the audio-clock time it started, for lip sync. */
+/** A cut on screen. `light` overrides its shot's grade for this pass. */
+type OnScreen = Cut & { start: number; light?: Shot["light"] };
+
 type Listening = {
   hold: HoldId;
   heard: string;
@@ -99,7 +110,8 @@ export function FilmPlayer() {
   const typedRef = useRef<((t: string) => void) | null>(null);
 
   const [phase, setPhase] = useState<"title" | "film" | "end">("title");
-  const [stack, setStack] = useState<string[]>([]);
+  const [stack, setStack] = useState<OnScreen[]>([]);
+  const [upcoming, setUpcoming] = useState<string[]>([]);
   const [sub, setSub] = useState<Line | null>(null);
   const [captions, setCaptions] = useState(true);
   const [listening, setListening] = useState<Listening | null>(null);
@@ -126,6 +138,7 @@ export function FilmPlayer() {
   }, []);
 
   const current = stack.at(-1);
+  const clock = useCallback(() => soundRef.current?.ctx.currentTime ?? 0, []);
 
   const run = useCallback(async () => {
     runRef.current?.abort();
@@ -159,27 +172,93 @@ export function FilmPlayer() {
       await sleep(250, signal);
     };
 
-    const play = async (id: string) => {
+    /**
+     * Plays a reel as a timeline: every cut and every sound cue is scheduled
+     * against the audio clock up front, so sound can overlap cuts and sync
+     * sound stays on the lips. Skipping jumps to the end of the reel.
+     * `light` regrades every cut aboard the ship, e.g. after the power is cut.
+     */
+    const reel = async (name: keyof typeof REELS, light?: Shot["light"]) => {
       if (signal.aborted) return;
-      const s = shot(id);
+      const seq = CUTS[name] ?? (await fromShots(REELS[name], sound));
       const both = skippable();
-      setStack((st) => [...st.slice(-1), id]);
-      prefetchAfter(id);
-      if (MOODS[id]) sound.mood(MOODS[id]);
-      void sound.sfx(s.sfx);
-      const start = performance.now();
-      if (s.line) {
-        await sleep(500, both);
-        setSub(s.line);
-        await sound.say(s.line, id === "H4", both);
-        setSub(null);
-      }
-      const left = s.seconds * 1000 - (performance.now() - start);
-      if (left > 0) await sleep(left, both);
-    };
+      const clips = [
+        ...new Set(seq.cuts.flatMap((c) => (c.clip && clipSrc(c.clip)) || [])),
+      ];
+      setUpcoming(clips);
+      // Sync sound has to be in hand before the clock starts, or it drifts.
+      const syncs = seq.cues.flatMap((c) => (c.kind === "sync" ? c.clip : []));
+      await Promise.race([
+        sound.preload([], [], [...new Set(syncs)]),
+        sleep(5000, both),
+      ]);
+      if (both.aborted) return;
+      const t0 = sound.ctx.currentTime + 0.2;
+      const onScreen = (cut: Cut, start: number): OnScreen => ({
+        ...cut,
+        start,
+        light: light && aboard(cut) ? light : undefined,
+      });
+      const timers: number[] = [];
+      const at = (sec: number, f: () => void) =>
+        timers.push(
+          window.setTimeout(
+            f,
+            Math.max(0, (t0 + sec - sound.ctx.currentTime) * 1000),
+          ),
+        );
+      const subtitle = (l: Line, from: number, to: number) => {
+        at(from, () => setSub(l));
+        at(to, () => setSub((x) => (x === l ? null : x)));
+      };
 
-    const reel = async (ids: readonly string[]) => {
-      for (const id of ids) await play(id);
+      for (const cut of seq.cuts)
+        at(cut.at, () => {
+          setStack((st) => [...st.slice(-1), onScreen(cut, t0 + cut.at)]);
+          if (!cut.clip) prefetchAfter(cut.shot);
+        });
+      for (const cue of seq.cues) place(cue);
+
+      function place(cue: Cue) {
+        const when = t0 + cue.at;
+        if (cue.kind === "sync")
+          void sound.place(syncUrl(cue.clip), {
+            at: when,
+            offset: cue.in,
+            dur: cue.dur,
+            gain: cue.gain,
+          });
+        else if (cue.kind === "fx")
+          void sound.place(sfxUrl(cue.sfx), {
+            at: when,
+            dur: cue.dur,
+            gain: cue.gain,
+            loop: SFX[cue.sfx]?.loop,
+            bus: "fx",
+          });
+        else if (cue.kind === "mood") at(cue.at, () => sound.mood(cue.mood));
+        else if (cue.kind === "sub") {
+          const l = lineById(cue.line);
+          subtitle(l, cue.at, cue.at + cue.dur);
+        } else {
+          const l = lineById(cue.line);
+          const words = sound.placeLine(l, when, cue.open) - t0;
+          void sound
+            .lineLength(l)
+            .then((len) => subtitle(l, words, words + len));
+        }
+      }
+
+      const end = Math.max(...seq.cuts.map((c) => c.at + c.dur));
+      await sleep((t0 + end - sound.ctx.currentTime) * 1000, both);
+      if (both.aborted) {
+        for (const t of timers) clearTimeout(t);
+        sound.clearPlaced();
+        setSub(null);
+        const last = seq.cuts.at(-1)!;
+        if (!signal.aborted)
+          setStack((st) => [...st.slice(-1), onScreen(last, -1)]);
+      }
     };
 
     const ask = (hold: HoldId, patience: number) => {
@@ -232,19 +311,20 @@ export function FilmPlayer() {
       return outcome;
     };
 
-    await reel(REELS.open);
+    await reel("open");
     await hold("hello");
-    await reel(REELS.act1);
+    await reel("act1");
     const greenhouse = await hold("greenhouse");
-    await reel(greenhouse === "outside" ? REELS.outside : REELS.seal);
-    await reel(REELS.act2);
+    await reel(greenhouse === "outside" ? "outside" : "seal");
+    await reel("act2");
     const arc = await hold("arc");
-    await reel(arc === "hear" ? REELS.hear : REELS.unplug);
-    await reel(REELS.act3);
+    await reel(arc === "hear" ? "hear" : "unplug");
+    // Unplugging ARC leaves the ship on red emergency light for act 3.
+    await reel("act3", arc === "hear" ? undefined : "red");
     const final = await hold("final");
     const end: Ending =
       final === "static" || trust < TRUSTED ? "static" : (final as Ending);
-    await reel(REELS[end]);
+    await reel(end);
     if (signal.aborted) return;
     // The film is over: let everything, static included, fade to nothing.
     void sound.fadeOut(6);
@@ -280,7 +360,7 @@ export function FilmPlayer() {
     return () => window.removeEventListener("keydown", onKey);
   }, [phase, listening]);
 
-  const s = current ? shot(current) : null;
+  const s = current ? shot(current.shot) : null;
 
   return (
     <div
@@ -295,15 +375,23 @@ export function FilmPlayer() {
 
         {phase !== "title" && (
           <div className="absolute inset-x-0 top-[6%] aspect-[2.39/1] overflow-hidden sm:inset-0 sm:aspect-auto">
-            {stack.map((id, i) => (
+            {stack.map((cut, i) => (
               <Frame
-                key={`${id}-${i}`}
-                shot={shot(id)}
-                index={i}
+                key={`${cut.shot}-${cut.clip}-${cut.start}`}
+                cut={cut}
+                clock={clock}
                 top={i === stack.length - 1}
               />
             ))}
-            {phase === "film" && s && <CamOverlay shot={s} />}
+            {/* The reel's footage, loading ahead of its cuts. */}
+            <div hidden>
+              {upcoming.map((c) => (
+                <video key={c} src={c} preload="auto" muted />
+              ))}
+            </div>
+            {phase === "film" && s && (
+              <CamOverlay shot={s} cam={current?.cam ?? s.cam} />
+            )}
           </div>
         )}
 
@@ -346,7 +434,7 @@ export function FilmPlayer() {
               type="button"
               onClick={() => skipRef.current?.abort()}
               className="rounded border border-paper/40 px-2 py-1 hover:bg-paper hover:text-ink disabled:opacity-30"
-              title="Skip this shot (→)"
+              title="Skip ahead (→)"
             >
               SKIP ›
             </button>
@@ -375,48 +463,104 @@ function prefetchAfter(id: string) {
 
 const shotSrc = (id: string) => `/last-signal/film/shots/${id}.webp`;
 
-/** One shot: a still with a slow camera move, or a live ship screen. */
+/**
+ * Builds a timeline for a reel that hasn't been cut from footage yet: each
+ * shot's still holds for its seconds, or as long as its line runs, and a
+ * sound effect carries across the shots that share it.
+ */
+async function fromShots(
+  ids: readonly string[],
+  sound: FilmSound,
+): Promise<Sequence> {
+  const cuts: Sequence["cuts"] = [];
+  const cues: Cue[] = [];
+  let t = 0;
+  const run: { fx?: { sfx: string; at: number } } = {};
+  const endFx = () => {
+    const fx = run.fx;
+    if (fx) cues.push({ kind: "fx", at: fx.at, sfx: fx.sfx, dur: t - fx.at });
+    run.fx = undefined;
+  };
+  for (const id of ids) {
+    const s = shot(id);
+    if (MOODS[id]) cues.push({ kind: "mood", at: t, mood: MOODS[id] });
+    if (run.fx?.sfx !== s.sfx) {
+      endFx();
+      if (s.sfx) run.fx = { sfx: s.sfx, at: t };
+    }
+    let dur = s.seconds;
+    if (s.line) {
+      cues.push({
+        kind: "line",
+        at: t + 0.5,
+        line: s.line.id,
+        open: id === "H4",
+      });
+      const len = await sound.lineLength(s.line);
+      dur = Math.max(dur, 0.5 + (s.line.who === "ARC" ? 1 : 0) + len + 0.25);
+    }
+    cuts.push({ shot: id, at: t, dur, title: s.title, dissolve: true });
+    t += dur;
+  }
+  endFx();
+  return { cuts, cues };
+}
+
+/** Whether a cut's camera is inside the ship, so it shares the ship's lighting. */
+function aboard(cut: Cut) {
+  const cam = cut.cam ?? shot(cut.shot).cam;
+  return cam !== "EXT" && cam !== "DISH";
+}
+
+/** One cut: a clip in sync with the audio clock, a still with a slow camera move, or a live ship screen. */
 function Frame({
-  shot: s,
-  index,
+  cut,
+  clock,
   top,
 }: {
-  shot: Shot;
-  index: number;
+  cut: OnScreen;
+  clock: () => number;
   top: boolean;
 }) {
+  const s = shot(cut.shot);
   const move = ["kb-in", "kb-left", "kb-out", "kb-right"][
-    (s.id.charCodeAt(1) + index) % 4
+    (s.id.charCodeAt(1) + Math.round(cut.start)) % 4
   ];
+  const light = cut.light ?? s.light;
   const grade =
-    s.light === "red"
+    light === "red"
       ? "after:bg-[#ff2a10]/25 after:mix-blend-multiply"
-      : s.light === "dawn"
+      : light === "dawn"
         ? "after:bg-[#ffb35c]/12 after:mix-blend-soft-light"
         : "";
+  const cam = cut.cam ?? s.cam;
+  const sec = cam.startsWith("SEC") || cam === "COMMS" ? "saturate-[0.82]" : "";
+  const src = cut.clip && clipSrc(cut.clip);
   return (
     <div
-      className={`absolute inset-0 overflow-hidden ${top ? "film-in z-10" : "z-0"} after:absolute after:inset-0 ${grade}`}
+      className={`absolute inset-0 overflow-hidden ${top ? `${cut.dissolve ? "film-in" : ""} z-10` : "z-0"} after:absolute after:inset-0 ${grade}`}
     >
-      {s.insert ? (
-        <InsertScreen kind={s.insert} seconds={s.seconds} />
+      {src ? (
+        <ClipVideo cut={cut} src={src} clock={clock} className={sec} />
+      ) : s.insert ? (
+        <InsertScreen kind={s.insert} seconds={cut.dur} />
       ) : (
         <Image
           src={shotSrc(s.id)}
           alt={s.action}
           fill
           sizes="(min-width: 72rem) 72rem, 100vw"
-          className={`object-cover ${move} ${s.cam.startsWith("SEC") ? "saturate-[0.82]" : ""}`}
-          style={{ animationDuration: `${s.seconds + 2}s` }}
+          className={`object-cover ${move} ${sec}`}
+          style={{ animationDuration: `${cut.dur + 2}s` }}
           priority={s.id === "01"}
         />
       )}
-      {s.cam === "HELM" && !s.insert && (
+      {cam === "HELM" && !s.insert && (
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_95%_at_center,transparent_55%,#000_100%)]" />
       )}
-      {s.title && (
+      {cut.title && (
         <p className="title-in absolute bottom-[12%] left-[5%] z-20 font-display text-[clamp(14px,2.4vw,30px)] italic [text-shadow:0_2px_8px_#000]">
-          {s.title}
+          {cut.title}
         </p>
       )}
       <div className="grain absolute inset-0" />
@@ -424,23 +568,69 @@ function Frame({
   );
 }
 
-function CamOverlay({ shot: s }: { shot: Shot }) {
+/**
+ * Picture only: its sound is on the timeline. It starts where the clock says
+ * it should be by now, so a slow load drops frames rather than sync, and
+ * after a skip (start < 0) it shows the cut's last frame.
+ */
+function ClipVideo({
+  cut,
+  src,
+  clock,
+  className,
+}: {
+  cut: OnScreen;
+  src: string;
+  clock: () => number;
+  className: string;
+}) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    const go = () => {
+      const from = cut.in ?? 0;
+      if (cut.start < 0) {
+        v.currentTime = Math.min(from + cut.dur, v.duration - 0.05);
+        return;
+      }
+      v.currentTime = from + Math.max(0, clock() - cut.start);
+      void v.play().catch(() => {});
+    };
+    if (v.readyState >= 1) go();
+    else v.addEventListener("loadedmetadata", go, { once: true });
+    return () => v.removeEventListener("loadedmetadata", go);
+  }, [cut, clock]);
+  return (
+    <video
+      ref={ref}
+      src={src}
+      aria-label={shot(cut.shot).action}
+      muted
+      playsInline
+      preload="auto"
+      className={`absolute inset-0 h-full w-full object-cover ${className}`}
+    />
+  );
+}
+
+function CamOverlay({ shot: s, cam }: { shot: Shot; cam: Cam }) {
   const [met, setMet] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setMet((m) => m + 1), 1000);
     return () => clearInterval(t);
   }, []);
   const clock = new Date((771_552 + met) * 1000).toISOString().slice(11, 19);
-  if (s.cam.startsWith("SEC"))
+  if (cam.startsWith("SEC") || cam === "COMMS")
     return (
       <div className="scanlines pointer-events-none absolute inset-0 z-20 p-[2%] font-mono text-[clamp(8px,1.1vw,13px)] tracking-widest text-white/80">
-        <p>{CAM_NAMES[s.cam]}</p>
+        <p>{CAM_NAMES[cam]}</p>
         <p className="mt-1 opacity-80">
           <span className="blink text-tomato">●</span> REC · MET 214:{clock}
         </p>
       </div>
     );
-  if (s.cam === "HELM" && !s.insert)
+  if (cam === "HELM" && !s.insert)
     return (
       <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-between p-[3%] font-mono text-[clamp(8px,1.1vw,13px)] tracking-widest text-[#7dffa8]/80">
         <span>HELM · VARGA</span>

@@ -1,20 +1,29 @@
 /**
  * Turns the Last Signal shot list (src/content/last-signal-film.ts) into media:
  * a still per shot (fal, Nano Banana Pro, against Ines's character sheet and
- * earlier shots of the same set), a voice take per line (ElevenLabs v4), and a
- * sound effect per cue. Only missing files are made, so re-running is cheap;
- * delete a file to regenerate it.
+ * earlier shots of the same set), a voice take per line (ElevenLabs v4), a
+ * sound effect per cue, and a video clip for the shots in CLIPS (fal, MiniMax
+ * H3 Max reference-to-video, from the shot's master still). Only missing files
+ * are made, so re-running is cheap; delete a file to regenerate it.
  *
- *   bun scripts/last-signal.ts [lines|sfx|shots] [shot ids...]
+ *   bun scripts/last-signal.ts [lines|sfx|shots|clips|encode] [ids...]
  *
  * Needs FAL_KEY and ELEVENLABS_API_KEY. Full-size masters go to MASTERS
  * (default: .last-signal-masters/, not committed); the site gets 1920px WebP.
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import {
   allLines,
+  CLIP_STYLE,
+  CLIPS,
   SFX,
   SHOTS,
   STYLE_SUFFIX,
@@ -97,7 +106,9 @@ async function fal(model: string, input: object) {
     body: JSON.stringify(input),
   });
   if (!queued.ok) throw new Error(`${queued.status} ${await queued.text()}`);
-  const { status_url, response_url } = await queued.json();
+  const { request_id, status_url, response_url } = await queued.json();
+  // Logged so a run that dies midway can still collect what it paid for.
+  appendFileSync(join(MASTERS, "fal-requests.log"), `${model} ${request_id}\n`);
   for (;;) {
     await sleep(3000);
     const s = await (await fetch(status_url, { headers })).json();
@@ -178,12 +189,77 @@ async function shots(only: string[]) {
     if (r.status === "rejected") console.error(todo[i].id, r.reason);
 }
 
+/** A clip of coverage: picture to clips/<id>.mp4, production sound to .mp3. */
+async function clip(id: string) {
+  const c = CLIPS[id];
+  const mp4 = join(OUT, "clips", `${id}.mp4`);
+  if (existsSync(mp4)) return;
+  const images = (c.stills ?? [c.shot]).map((s) =>
+    dataUri(master(s), "image/jpeg"),
+  );
+  if (c.ines)
+    images.push(
+      dataUri("public/last-signal/ines.webp", "image/webp"),
+      dataUri("public/last-signal/ines-sheet.webp", "image/webp"),
+    );
+  const out = await fal("minimax/h3-max/reference-to-video", {
+    prompt: `${c.motion} ${CLIP_STYLE}`,
+    duration: c.seconds,
+    // 768p is plenty behind grain and a 2.39 letterbox, at half the price.
+    resolution: "768P",
+    aspect_ratio: "21:9",
+    reference_image_urls: images,
+    ...(c.voice
+      ? {
+          reference_audio_urls: [dataUri(voiceRef(c.voice), "audio/mpeg")],
+        }
+      : {}),
+  });
+  // v3b.fal.media is blocked on some build boxes; v3 serves the same files.
+  const url = (out.video.url as string).replace("//v3b.", "//v3.");
+  const raw = join(MASTERS, `${id}.mp4`);
+  writeFileSync(raw, Buffer.from(await (await fetch(url)).arrayBuffer()));
+  encodeClip(raw, id);
+  console.log("clip", id);
+}
+
+/** fal wants at least 2 s of reference audio; short takes get padded with silence. */
+function voiceRef(line: string) {
+  const take = join(OUT, "lines", `${line}.mp3`);
+  const len = Number(
+    execFileSync("ffprobe", [
+      ...["-v", "error", "-show_entries", "format=duration"],
+      ...["-of", "csv=p=0", take],
+    ]).toString(),
+  );
+  if (len >= 2.2) return take;
+  const padded = join(MASTERS, `${line}-ref.mp3`);
+  execFileSync("ffmpeg", [
+    ...["-v", "error", "-y", "-i", take, "-af", "apad=whole_dur=2.5"],
+    padded,
+  ]);
+  return padded;
+}
+
+function encodeClip(raw: string, id: string) {
+  const base = join(OUT, "clips", id);
+  execFileSync("ffmpeg", [
+    ...["-v", "error", "-y", "-i", raw, "-an", "-vf", "scale=1600:-2"],
+    ...["-c:v", "libx264", "-preset", "slow", "-crf", "25"],
+    ...["-pix_fmt", "yuv420p", "-movflags", "+faststart", `${base}.mp4`],
+  ]);
+  execFileSync("ffmpeg", [
+    ...["-v", "error", "-y", "-i", raw, "-vn", "-ac", "2", "-b:a", "128k"],
+    `${base}.mp3`,
+  ]);
+}
+
 async function inBatches<T>(items: T[], n: number, f: (t: T) => Promise<void>) {
   for (let i = 0; i < items.length; i += n)
     await Promise.all(items.slice(i, i + n).map(f));
 }
 
-for (const d of ["lines", "sfx", "shots"])
+for (const d of ["lines", "sfx", "shots", "clips"])
   mkdirSync(join(OUT, d), { recursive: true });
 mkdirSync(MASTERS, { recursive: true });
 
@@ -191,3 +267,9 @@ const [what, ...ids] = process.argv.slice(2);
 if (!what || what === "lines") await inBatches(allLines(), 4, speak);
 if (!what || what === "sfx") await inBatches(Object.keys(SFX), 4, sound);
 if (!what || what === "shots") await shots(ids);
+if (!what || what === "clips")
+  await inBatches(ids.length ? ids : Object.keys(CLIPS), 4, clip);
+// Re-encode clips from their masters, e.g. after changing the encode.
+if (what === "encode")
+  for (const id of ids.length ? ids : Object.keys(CLIPS))
+    encodeClip(join(MASTERS, `${id}.mp4`), id);

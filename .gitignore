@@ -42,3 +42,5 @@ next-env.d.ts
 
 .netlify
 .last-signal-masters/
+# Video plays from Cloudflare Stream (scripts/last-signal-stream.ts), not the repo.
+/public/**/*.mp4

@@ -1,4 +1,4 @@
-import type { Line } from "@/content/last-signal-film";
+import type { Line, Mood } from "@/content/last-signal-film";
 import { SFX } from "@/content/last-signal-film";
 
 /**
@@ -7,7 +7,7 @@ import { SFX } from "@/content/last-signal-film";
  * ARC is in the room, clean, after a cabin chime; the static bed rises
  * whenever Ines is waiting on you.
  */
-export type Mood = "ambient" | "tension" | "resolve" | "silence";
+export type { Mood };
 
 export class FilmSound {
   readonly ctx: AudioContext;
@@ -24,6 +24,8 @@ export class FilmSound {
     gain: GainNode;
   } | null = null;
   private voices = new Set<AudioBufferSourceNode>();
+  /** Everything laid on the timeline, so a skip can pull it all. */
+  private placed = new Set<AudioScheduledSourceNode>();
 
   constructor() {
     const ctx = new AudioContext();
@@ -126,11 +128,84 @@ export class FilmSound {
     return this.buffers.get(url)!;
   }
 
-  preload(lines: Line[], cues: string[]) {
+  preload(lines: Line[], cues: string[], clips: string[] = []) {
     return Promise.allSettled([
       ...lines.map((l) => this.load(lineUrl(l))),
       ...cues.map((c) => this.load(sfxUrl(c))),
+      ...clips.map((c) => this.load(syncUrl(c))),
     ]);
+  }
+
+  /**
+   * Lays a sound on the timeline at context time `at`, from `offset` seconds
+   * into it, for `dur` seconds, with short fades so cuts don't click. If it
+   * loads late, it comes in where it would have been, so sync holds.
+   */
+  async place(
+    url: string,
+    opts: {
+      at: number;
+      offset?: number;
+      dur?: number;
+      gain?: number;
+      loop?: boolean;
+      bus?: "fx" | "room" | "radio";
+    },
+  ) {
+    const buf = await this.load(url).catch(() => null);
+    if (!buf || this.ctx.state === "closed") return 0;
+    const { at, offset = 0, gain = 1, loop = false, bus = "room" } = opts;
+    const dur = opts.dur ?? (loop ? 0 : buf.duration - offset);
+    const now = this.ctx.currentTime;
+    const late = Math.max(0, now - at);
+    if (late >= dur) return buf.duration;
+    const start = at + late;
+    const end = at + dur;
+    const src = this.ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = loop;
+    const g = this.ctx.createGain();
+    const fade = Math.min(0.08, dur / 4);
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(gain, start + fade);
+    g.gain.setValueAtTime(gain, end - fade);
+    g.gain.linearRampToValueAtTime(0, end);
+    const out =
+      bus === "fx" ? this.sfxBus : bus === "radio" ? this.radio : this.room;
+    src.connect(g).connect(out);
+    src.start(start, loop ? (offset + late) % buf.duration : offset + late);
+    src.stop(end);
+    this.placed.add(src);
+    src.onended = () => this.placed.delete(src);
+    return buf.duration;
+  }
+
+  /** A line on the timeline: ARC after its chime, Ines over the radio. Returns when the words start. */
+  placeLine(line: Line, at: number, open = false) {
+    let start = at;
+    if (line.who === "ARC") start = this.chime(at);
+    void this.place(lineUrl(line), {
+      at: start,
+      bus: open || line.who === "ARC" ? "room" : "radio",
+    });
+    return start;
+  }
+
+  lineLength(line: Line) {
+    return this.load(lineUrl(line))
+      .then((b) => b.duration)
+      .catch(() => 4);
+  }
+
+  /** Pulls everything laid on the timeline, for a skip. */
+  clearPlaced() {
+    const now = this.ctx.currentTime;
+    for (const s of this.placed) {
+      try {
+        s.stop(now + 0.05);
+      } catch {}
+    }
+    this.placed.clear();
   }
 
   mood(m: Mood, seconds = 4) {
@@ -229,6 +304,7 @@ export class FilmSound {
   }
 
   hush() {
+    this.clearPlaced();
     for (const v of this.voices) {
       try {
         v.stop();
@@ -256,3 +332,4 @@ export class FilmSound {
 
 export const lineUrl = (l: Line) => `/last-signal/film/lines/${l.id}.mp3`;
 export const sfxUrl = (id: string) => `/last-signal/film/sfx/${id}.mp3`;
+export const syncUrl = (clip: string) => `/last-signal/film/clips/${clip}.mp3`;
